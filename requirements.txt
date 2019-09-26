@@ -1,0 +1,8 @@
+pyquaternion
+mrcfile
+sklearn
+numpy
+matplotlib
+scipy
+scikit-image
+h5py
