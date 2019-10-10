@@ -3,15 +3,13 @@
 Scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes.
 
 ## Installation
-First, install Astra-Toolbox. Astra-Toolbox should be installed as indicated in their [GitHub repo](https://github.com/astra-toolbox/astra-toolbox).
+Create the conda environment in which the project will be ran.
 ```
-# what I concretelly used (other choices can be found in their repo)
-$ conda install -c astra-toolbox astra-toolbox
-```
+# create environment
+$ conda env create -f environment.yml
 
-Afterwards, in the root directory of the project, run:
-```
-pip install -r requirements.txt
+# activate environment
+$ conda activate protein_reconstruction
 ```
 
 [Optional] Test if some dependencies are installed:
