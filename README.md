@@ -48,9 +48,9 @@ optional arguments:
 
 Main use is:
 ```
-python generator.py -mrc generated_data/bgal.mrc 
+python generator.py -mrc data/bgal.mrc 
 
-python generator.py -mrc generated_data/bgal.mrc -cov 1
+python generator.py -mrc data/bgal.mrc -cov 1
 ```
 
 ## Misc information
