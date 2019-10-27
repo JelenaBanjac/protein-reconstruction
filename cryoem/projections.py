@@ -18,6 +18,7 @@ import pathlib
 import h5py
 
 
+
 def RotationMatrix(angles):
 	"""
 	Rotation matrix from: https://www.geometrictools.com/Documentation/EulerAngles.pdf
@@ -48,10 +49,9 @@ def RotationMatrix(angles):
 	s3 = np.sin(angles[:,2]).reshape(-1,1,1)
 	vector = vectors[0,:]
 	 
-	R = np.concatenate([np.concatenate([c2,    -c3*s2,           s2*s3            ], axis=2), 
-						np.concatenate([c1*s2, c1*c2*c3 - s1*s3, -c3*s1 - c1*c2*s3], axis=2),
-						np.concatenate([s1*s2, c1*s3 + c2*c3*s1, c1*c3 - c2*s1*s3 ], axis=2)],
-						axis=1)
+	R = np.concatenate([np.concatenate([c3*c2*c1-s3*s1, c3*c2*s1 + s3*c1, -c3*s2],axis=2),\
+					np.concatenate([-s3*c2*c1-c3*s1,-s3*c2*s1+c3*c1 , s3*s2],axis=2),\
+					np.concatenate( [s2*c1,          s2*s1          , c2],axis=2)],axis=1)
 
 	# rotate previous values
 	vectors[:,0:3] = np.matmul(R,vector[0:3])
@@ -59,6 +59,49 @@ def RotationMatrix(angles):
 	vectors[:,9:12] = np.matmul(R,vector[9:12])
 	
 	return vectors
+
+	# pi=np.pi
+	# vectors=np.zeros((angles.shape[0],12))
+	# vectors[:,0] = 0
+	# vectors[:,1] = 0
+	# vectors[:,2] = 1
+
+	# # center of detector
+	# vectors[:,3:6] = 0
+
+	# # vector from detector pixel (0,0) to (0,1)
+	# vectors[:,6] = 1
+	# vectors[:,7] = 0;
+	# vectors[:,8] = 0;
+
+	# # vector from detector pixel (0,0) to (1,0)
+	# vectors[:,9] = 0
+	# vectors[:,10] = 1
+	# vectors[:,11] = 0
+	# #vector=vectors[0].detach()
+
+	# c1=(angles[:,0]).cos().view(-1,1,1);
+	# c2=(angles[:,1]).cos().view(-1,1,1);
+	# c3=(angles[:,2]).cos().view(-1,1,1);
+
+	# s1=(angles[:,0]).sin().view(-1,1,1);
+	# s2=(angles[:,1]).sin().view(-1,1,1);
+	# s3=(angles[:,2]).sin().view(-1,1,1);
+
+	# R = np.concatenate([np.concatenate([c3*c2*c1-s3*s1, c3*c2*s1 + s3*c1, -c3*s2],axis=2),\
+	# 				np.concatenate([-s3*c2*c1-c3*s1,-s3*c2*s1+c3*c1 , s3*s2],axis=2),\
+	# 				np.concatenate( [s2*c1,          s2*s1          , c2],axis=2)],axis=1);
+
+	# # why transpose here? because transpose is inverse
+	# # and inverting the matrix means we are applying it to the object rather than the coordinate system
+	# # if you doubt this, try putting pi/4 for all angles and compare to
+	# # https://ars.els-cdn.com/content/image/1-s2.0-S1047847705001231-gr1_lrg.jpg
+	# # the vectors you get out
+	# vectors[:,0:3] = R.permute(0, 2, 1).matmul(vector[0:3])
+	# vectors[:,6:9] = R.permute(0, 2, 1).matmul(vector[6:9])
+	# vectors[:,9:12]= R.permute(0, 2, 1).matmul(vector[9:12])
+
+	# return vectors
 
 
 def project_volume(Vol, Angles, Vol_geom, ProjSize):
@@ -84,7 +127,18 @@ def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra):
 	Vol_geom    = astra.create_vol_geom(Vol.shape[1], Vol.shape[2], Vol.shape[0])
 	
 	# Generate random angles
-	Angles      = AngShift + AngCoverage*2*np.pi*np.random.random(size=(BatchSizeAstra, 3))
+	#Angles      = AngShift + AngCoverage*2*np.pi*np.random.random(size=(BatchSizeAstra, 3))
+
+	#X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	#Y =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	Y =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+
+	Z =  AngShift + 2*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	Angles = np.concatenate((X, Y, Z), axis=1)
+
+	# print(Angles)
+	# print(np.min(Angles, axis=0), np.max(Angles, axis=0))
 	
 	# Generate projections
 	Projections = project_volume(Vol, Angles, Vol_geom, ProjSize)
