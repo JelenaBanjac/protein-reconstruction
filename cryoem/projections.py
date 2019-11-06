@@ -130,11 +130,12 @@ def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra):
 	#Angles      = AngShift + AngCoverage*2*np.pi*np.random.random(size=(BatchSizeAstra, 3))
 
 	#X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-	X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
 	#Y =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	#Z =  AngShift + 2*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
 	Y =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	Z =  AngShift + np.pi*np.random.random(size=(BatchSizeAstra, 1))
 
-	Z =  AngShift + 2*np.pi*np.random.random(size=(BatchSizeAstra, 1))
 	Angles = np.concatenate((X, Y, Z), axis=1)
 
 	# print(Angles)
