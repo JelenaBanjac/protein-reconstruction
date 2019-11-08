@@ -132,9 +132,9 @@ def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra):
 	#X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
 	#Y =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
 	#Z =  AngShift + 2*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-	X =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-	Y =  AngShift + AngCoverage*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-	Z =  AngShift + np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	X =  AngShift + AngCoverage[0]*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	Y =  AngShift + AngCoverage[1]*np.pi*np.random.random(size=(BatchSizeAstra, 1))
+	Z =  AngShift + AngCoverage[2]*np.pi*np.random.random(size=(BatchSizeAstra, 1))
 
 	Angles = np.concatenate((X, Y, Z), axis=1)
 
@@ -153,19 +153,22 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, ou
 		Full path to the *.mrc file with 3D volume
 	ProjNber: int
 		Number of 2D projections 
-	AngCoverage: float
-		Angular coverage (0.5: half-sphere, 1: complete sphere) 
+	AngCoverage: list
+		list of max values for each axis. E.g. `0.5,0.5,2.0` means it: x axis angle and y axis angle take values in range [0, 0.5*pi], z axis angles in range [0, 2.0*pi]
 	AngShift: np.float 
 		Start of angular coverage
 	output_file_name: str
 		Just the name of the output *.mat file. 
 		If not specified, it will be generated automatically.
 	"""
+
 	# nber of projs created in a single ASTRA loop
 	BatchSizeAstra = 50 
 	
 	# filepaths 
-	output_file_name = output_file_name or f'ProjectionsAngles_ProjNber{ProjNber}_AngCoverage{AngCoverage}_AngShift{AngShift:.2f}.h5'
+	protein_name = input_file_path.split('/')[-1].split('.')[0]
+	coverage_str = str(AngCoverage).replace(" ", "")[1:-1]
+	output_file_name = output_file_name or f'{protein_name}_ProjectionsAngles_ProjNber{ProjNber}_AngCoverage{coverage_str}_AngShift{AngShift:.2f}.h5'
 	# get file extension
 	extension = output_file_name.split('.')[-1]
 	# storing output where the input mrc file is
