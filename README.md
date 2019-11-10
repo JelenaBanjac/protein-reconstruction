@@ -24,9 +24,8 @@ $ python3 -c "import astra;astra.test_CUDA()"
 ## Run
 
 ```
-usage: generator.py [-h] --input INPUT [--proj-num PROJ_NUM]
-                    [--ang-coverage ANG_COVERAGE] [--ang-shift ANG_SHIFT]
-                    [--output OUTPUT]
+usage: generator.py [-h] --input INPUT [--proj-num PROJ_NUM] --ang-coverage
+                    ANG_COVERAGE [--ang-shift ANG_SHIFT] [--output OUTPUT]
 
 Generator of 2D projections of 3D Cryo-Em volumes
 
@@ -35,15 +34,17 @@ optional arguments:
   --input INPUT, -mrc INPUT
                         Input file of 3D volume (*.mrc format)
   --proj-num PROJ_NUM, -num PROJ_NUM
-                        Number of 2D projections. Default 50000
+                        Number of 2D projections. Default 5000
   --ang-coverage ANG_COVERAGE, -cov ANG_COVERAGE
-                        Angular coverage (0.5: half-sphere, 1: complete
-                        sphere). Default 0.5
+                        List of max values for each axis. E.g. `0.5,0.5,2.0`
+                        means it: x axis angle and y axis angle take values in
+                        range [0, 0.5*pi], z axis angles in range [0, 2.0*pi]
   --ang-shift ANG_SHIFT, -shift ANG_SHIFT
-                        Start of angular coverage. Default pi/2
+                        Start of angular coverage. Default 0
   --output OUTPUT, -mat OUTPUT
                         Name of output file containing projections with angles
                         (with the extension)
+
 ```
 
 Main use is:
