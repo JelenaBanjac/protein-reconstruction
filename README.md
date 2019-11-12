@@ -51,7 +51,9 @@ Main use is:
 ```
 python generator.py -mrc data/bgal.mrc 
 
-python generator.py -mrc data/bgal.mrc -cov 1
+python generator.py -mrc data/bgal.mrc -cov 1.0,1.0,1.0
+
+python generator.py -mrc data/5j0n.mrc -shift 0 -num 5000 -cov 2.0,1.0,2.0
 ```
 
 ## Misc information

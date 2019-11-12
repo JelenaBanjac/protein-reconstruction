@@ -17,6 +17,7 @@ dependencies:
   - ca-certificates=2019.9.11=hecc5488_0
   - certifi=2019.9.11=py36_0
   - cffi=1.13.1=py36h8022711_0
+  - chardet=3.0.4=py36_1003
   - cloudpickle=1.2.2=py_0
   - cryptography=2.7=py36h72c5cf5_0
   - cycler=0.10.0=py_1
@@ -38,6 +39,7 @@ dependencies:
   - hdf5=1.10.4=hb1b8bf9_0
   - html5lib=0.9999999=py36_0
   - icu=58.2=hf484d3e_1000
+  - idna=2.8=py36_1000
   - imageio=2.6.1=py36_0
   - intel-openmp=2019.4=243
   - ipydatawidgets=4.0.1=py_0
@@ -139,6 +141,7 @@ dependencies:
   - toolz=0.10.0=py_0
   - tornado=6.0.3=py36h516909a_0
   - traitlets=4.3.3=py36_0
+  - traittypes=0.2.1=py_1
   - urllib3=1.25.6=py36_0
   - wcwidth=0.1.7=py36_0
   - webencodings=0.5.1=py_1
@@ -152,10 +155,9 @@ dependencies:
   - zlib=1.2.11=h7b6447c_3
   - zstd=1.4.0=h3b9ef0a_0
   - pip:
-    - chardet==3.0.4
     - google-pasta==0.1.7
-    - idna==2.8
     - keras-applications==1.0.8
+    - keras-preprocessing==1.1.0
     - numpy==1.17.2
     - opt-einsum==3.1.0
     - pandas==0.25.2
@@ -163,6 +165,5 @@ dependencies:
     - tensorflow-estimator==2.0.0
     - tensorflow-gpu==2.0.0
     - tensorflow-graphics==1.0.0
-    - traittypes==0.2.1
 prefix: /home/jelena/anaconda3/envs/protein_reconstruction
 
