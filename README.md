@@ -65,3 +65,15 @@ python-3.6.8
 cudnn-7.1.3
 cudatoolkit-8.0
 ```
+```
+cuda 10
+cuDNN 7
+nvidia driver 415
+
+```
+
+```
+$ nvcc --version
+
+$ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+```
