@@ -43,7 +43,7 @@ optional arguments:
                         Start of angular coverage. Default 0
   --output OUTPUT, -mat OUTPUT
                         Name of output file containing projections with angles
-                        (with the extension)
+                        (with the extension) e.g. .h5
 
 ```
 
@@ -56,7 +56,7 @@ python generator.py -mrc data/bgal.mrc -cov 1.0,1.0,1.0
 python generator.py -mrc data/5j0n.mrc -shift 0 -num 5000 -cov 2.0,1.0,2.0
 
 # almost half sphere
-python generator.py -mrc data/5j0n.mrc -shift 0 -num 5000  -shift 0.0,0.1,0.0  -cov 2.0,0.8,1.0
+python generator.py -mrc data/5j0n.mrc -num 5000  -shift 0.0,0.1,0.0  -cov 2.0,0.8,1.0
 ```
 
 ## Misc information
