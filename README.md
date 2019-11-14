@@ -37,8 +37,8 @@ optional arguments:
                         Number of 2D projections. Default 5000
   --ang-coverage ANG_COVERAGE, -cov ANG_COVERAGE
                         List of max values for each axis. E.g. `0.5,0.5,2.0`
-                        means it: x axis angle and y axis angle take values in
-                        range [0, 0.5*pi], z axis angles in range [0, 2.0*pi]
+                        means it: z axis angle and y axis angle take values in
+                        range [0, 0.5*pi], x axis angles in range [0, 2.0*pi]
   --ang-shift ANG_SHIFT, -shift ANG_SHIFT
                         Start of angular coverage. Default 0
   --output OUTPUT, -mat OUTPUT
@@ -54,6 +54,9 @@ python generator.py -mrc data/bgal.mrc
 python generator.py -mrc data/bgal.mrc -cov 1.0,1.0,1.0
 
 python generator.py -mrc data/5j0n.mrc -shift 0 -num 5000 -cov 2.0,1.0,2.0
+
+# almost half sphere
+python generator.py -mrc data/5j0n.mrc -shift 0 -num 5000  -shift 0.0,0.1,0.0  -cov 2.0,0.8,1.0
 ```
 
 ## Misc information
