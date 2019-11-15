@@ -24,39 +24,46 @@ $ python3 -c "import astra;astra.test_CUDA()"
 ## Run
 
 ```
-usage: generator.py [-h] --input INPUT [--proj-num PROJ_NUM] --ang-coverage
-                    ANG_COVERAGE [--ang-shift ANG_SHIFT] [--output OUTPUT]
+usage: generator.py [-h] --config-file CONFIG_FILE [--input-file INPUT_FILE]
+                    [--projections-num PROJECTIONS_NUM]
+                    [--angle-shift ANGLE_SHIFT]
+                    [--angle-coverage ANGLE_COVERAGE]
+                    [--output-file OUTPUT_FILE]
 
-Generator of 2D projections of 3D Cryo-Em volumes
+Generator of 2D projections of 3D Cryo-Em volumes Args that start with '--'
+(eg. --input-file) can also be set in a config file (protein.config or
+specified via --config-file). Config file syntax allows: key=value, flag=true,
+stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
+specified in more than one place, then commandline values override config file
+values which override defaults.
 
 optional arguments:
   -h, --help            show this help message and exit
-  --input INPUT, -mrc INPUT
+  --config-file CONFIG_FILE, -conf CONFIG_FILE
+                        Config file path
+  --input-file INPUT_FILE, -in INPUT_FILE
                         Input file of 3D volume (*.mrc format)
-  --proj-num PROJ_NUM, -num PROJ_NUM
+  --projections-num PROJECTIONS_NUM, -num PROJECTIONS_NUM
                         Number of 2D projections. Default 5000
-  --ang-coverage ANG_COVERAGE, -cov ANG_COVERAGE
-                        List of max values for each axis. E.g. `0.5,0.5,2.0`
-                        means it: z axis angle and y axis angle take values in
-                        range [0, 0.5*pi], x axis angles in range [0, 2.0*pi]
-  --ang-shift ANG_SHIFT, -shift ANG_SHIFT
-                        Start of angular coverage. Default 0
-  --output OUTPUT, -mat OUTPUT
+  --angle-shift ANGLE_SHIFT, -shift ANGLE_SHIFT
+                        Get the start Euler angles that will rotate around
+                        axes Z, Y, Z repsectively
+  --angle-coverage ANGLE_COVERAGE, -cov ANGLE_COVERAGE
+                        The range (size of the interval) of the Euler angles
+                        aroung Z, Y, Z axes respectively
+  --output-file OUTPUT_FILE, -out OUTPUT_FILE
                         Name of output file containing projections with angles
-                        (with the extension) e.g. .h5
+                        (with the extension)
 
 ```
 
 Main use is:
 ```
-python generator.py -mrc data/bgal.mrc 
+# read the settings from config file
+python generator.py -config protein.config
 
-python generator.py -mrc data/bgal.mrc -cov 1.0,1.0,1.0
-
-python generator.py -mrc data/5j0n.mrc -shift 0 -num 5000 -cov 2.0,1.0,2.0
-
-# almost half sphere
-python generator.py -mrc data/5j0n.mrc -num 5000  -shift 0.0,0.1,0.0  -cov 2.0,0.8,1.0
+# almost half sphere (overrides config default values)
+python generator.py -config protein.config -mrc data/5j0n.mrc -num 5000 -shift 0.0,0.1,0.0 -cov 2.0,0.8,1.0
 ```
 
 ## Misc information
@@ -80,3 +87,12 @@ $ nvcc --version
 
 $ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 ```
+
+# Notebooks
+
+BGAL:
+- [Optimization on predicted angle vs. true angle](bgal_optimization_predicted_angle_and_true_angle)
+- [Optimization on predicted angle vs. projection](bgal_optimization_predicted_angle_and_true_projection)
+
+5J0N:
+- 
