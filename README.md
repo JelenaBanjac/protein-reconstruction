@@ -91,8 +91,8 @@ $ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 # Notebooks
 
 BGAL:
-- [Optimization on predicted angle vs. true angle](bgal_optimization_predicted_angle_and_true_angle)
-- [Optimization on predicted angle vs. projection](bgal_optimization_predicted_angle_and_true_projection)
+- [Optimization on predicted angle vs. true angle](notebooks/bgal_optimization_predicted_angle_and_true_angle.ipynb)
+- [Optimization on predicted angle vs. projection](notebooks/bgal_optimization_predicted_angle_and_true_projection.ipynb)
 
 5J0N:
 - 
