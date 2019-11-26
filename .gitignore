@@ -2,7 +2,6 @@
 .vscode
 
 # data 
-data/
 notebooks/model
 notebooks/train.log
 
