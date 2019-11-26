@@ -170,6 +170,7 @@ dependencies:
   - certifi=2019.9.11=py36_0
   - cudatoolkit=10.0.130=0
   - cudnn=7.6.4=cuda10.0_0
+  - configargparse
 prefix: /home/jelena/anaconda3/envs/protein_reconstruction
 
 
