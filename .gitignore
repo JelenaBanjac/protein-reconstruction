@@ -2,6 +2,8 @@
 .vscode
 
 # data 
+*.h5
+*.npy
 notebooks/model
 notebooks/train.log
 

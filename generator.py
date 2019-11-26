@@ -26,4 +26,4 @@ generate_2D_projections(input_file_path=args.input_file,
                         ProjNber=args.projections_num,
                         AngCoverage=args.angle_coverage,
                         AngShift=args.angle_shift,
-                        output_file_name= args.output_file if args.output_file != "generated" else None )
+                        output_file_name= args.output_file if args.output_file != "null" else None )

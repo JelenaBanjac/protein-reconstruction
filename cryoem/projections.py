@@ -148,9 +148,15 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, ou
 		print('* Generating the dataset *\n')
 	
 		# Load 3D volume 
-		with mrcfile.open(input_file_path) as mrcVol:
-			Vol      = np.array(mrcVol.data) 
-			ProjSize = int(np.sqrt(np.sum(np.square(Vol.shape))))
+		try:
+			with mrcfile.open(input_file_path) as mrcVol:
+				Vol      = np.array(mrcVol.data) 
+				ProjSize = int(np.sqrt(np.sum(np.square(Vol.shape))))
+		except ValueError:
+			with mrcfile.open(input_file_path, mode='r+', permissive=True) as mrcVol:
+				mrcVol.header.map = mrcfile.constants.MAP_ID
+				Vol      = np.array(mrcVol.data) 
+				ProjSize = int(np.sqrt(np.sum(np.square(Vol.shape))))
 		
 		# Initialisations 
 		Projections = np.zeros((ProjNber, ProjSize, ProjSize), dtype=float)
