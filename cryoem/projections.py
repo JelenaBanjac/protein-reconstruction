@@ -147,7 +147,8 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, ou
 	else:
 		print('* Generating the dataset *\n')
 	
-		# Load 3D volume 
+		# Load 3D volume
+		# Value error fix explained here: https://mrcfile.readthedocs.io/en/latest/usage_guide.html 
 		try:
 			with mrcfile.open(input_file_path) as mrcVol:
 				Vol      = np.array(mrcVol.data) 
