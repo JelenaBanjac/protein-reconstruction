@@ -3,7 +3,9 @@
 
 # data 
 *.h5
-*.npy
+notebooks/data/*
+!notebooks/data/knn5*.npy
+
 notebooks/model
 notebooks/train.log
 
