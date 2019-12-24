@@ -96,3 +96,15 @@ BGAL:
 
 5J0N:
 - 
+
+Manifold learning (on 5j0n):
+- [MDS](notebooks/5j0n_manifold_learning_MDS.ipynb)
+- [Spectral Embedding](notebooks/5j0n_manifold_learning_SpectralEmbedding.ipynb)
+
+K-NN Adjacency matrices:
+- [projections and angles](notebooks/knn_adjacency_matrices.ipynb)
+
+Siamese NN (on 5j0n):
+- [random sampling](notebooks/Siamese_KERAS-protein-random.ipynb)
+- [knn projections and random sampling](notebooks/Siamese_KERAS-protein-knn-and-random.ipynb)
+- toberemoved 1K epochs [knn projections and random sampling](notebooks/Siamese_KERAS-protein-epochs1000.ipynb)
