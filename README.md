@@ -90,12 +90,39 @@ $ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 
 # Notebooks
 
-BGAL:
-- [Optimization on predicted angle vs. true angle](notebooks/bgal_optimization_predicted_angle_and_true_angle.ipynb)
-- [Optimization on predicted angle vs. projection](notebooks/bgal_optimization_predicted_angle_and_true_projection.ipynb)
+Data generation:
+- 5j0n_generate_data_5000_0.5sphere.ipynb
+- GeneratingData.ipynb
+- Graph-50000HalfAngCoverage.ipynb
+- Graph-5000FullAngCoverage.ipynb
+- Graph-5000HalfAngCoverage.ipynb
+- Graph-5000HalfAngCoverage-WithGaussNoise15.ipynb
+- Graph-5000HalfAngCoverage-WithGaussNoise2.ipynb
 
-5J0N:
-- 
+Different angle coverage visualizations:
+- angle_variety.ipynb
+
+Euclidean dP and Angle Recovery:
+- bgal_optimization_predicted_angle_and_true_angle.ipynb
+- 'bgal_optimization_predicted_angle_and_true_projection_(knn_and_slope).ipynb'
+- 'bgal_optimization_predicted_angle_and_true_projection_(knn_and_slope)-LR0.001.ipynb'
+- 'bgal_optimization_predicted_angle_and_true_projection_(knn&random_and_slope)-Copy1.ipynb'
+- 'bgal_optimization_predicted_angle_and_true_projection_(knn&random_and_slope).ipynb'
+- 'bgal_optimization_predicted_angle_and_true_projection_(random_and_polyfit)-CONSTRAINED-TODO.ipynb'
+- 'bgal_optimization_predicted_angle_and_true_projection_(random_and_polyfit).ipynb'
+- 'bgal_optimization_predicted_angle_and_true_projection_(random_and_slope).ipynb'
+- optimization_predicted_angle_and_true_projection.ipynb
+
+- 5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-corrected-%.ipynb
+- 5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-corrected.ipynb
+- 5j0n_optimization_predicted_angle_and_true_projection_0.5angcov.ipynb
+- 5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM-corrected-%.ipynb
+- 5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM-corrected.ipynb
+- 5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM.ipynb
+
+????????
+- angle_optimization.ipynb
+- angle_optimization_with_GT-notworking.ipynb
 
 Manifold learning (on 5j0n):
 - [MDS](notebooks/5j0n_manifold_learning_MDS.ipynb)
