@@ -7,8 +7,12 @@ nohup.out
 
 # data 
 *.h5
-notebooks/data/*
-!notebooks/data/knn5*.npy
+*.npy
+
+
+notebooks/0-preparation/data/*
+notebooks/1-phase1/data/*
+notebooks/2-phase2/data/*
 
 notebooks/model
 notebooks/train.log

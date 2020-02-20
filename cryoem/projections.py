@@ -21,11 +21,18 @@ import h5py
 def RotationMatrix(angles):
 	"""
 	Rotation matrix from: https://www.geometrictools.com/Documentation/EulerAngles.pdf
-	Chapter 2.8. Factor as Rx0 Rz Rx1
+	Chapter 2.12. Factor as Rz0 Ry Rz1
 	Also, playing with: https://eater.net/quaternions/video/doublecover
-	"""
-	#print(angles.shape)
 
+	`vectors` has size N x 12, where N is the number of projections and 12 corresponds to the following values:
+	( rayX, rayY, rayZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ )
+	Where:
+	- ray : the ray direction
+	- d : the center of the detector
+	- u : the vector from detector pixel (0,0) to (0,1)
+	- v : the vector from detector pixel (0,0) to (1,0)
+	Source: https://www.astra-toolbox.com/docs/geom3d.html
+	"""
 	vectors = np.zeros((angles.shape[0],12))
 	vectors[:,0:3] = [0, 0, 1]
 
@@ -49,9 +56,12 @@ def RotationMatrix(angles):
 	vector = vectors[0,:]
 	 
 	# Euler angles
-	R = np.concatenate([np.concatenate([c3*c2*c1-s3*s1, c3*c2*s1 + s3*c1, -c3*s2],axis=2),\
-					np.concatenate([-s3*c2*c1-c3*s1,-s3*c2*s1+c3*c1 , s3*s2],axis=2),\
-					np.concatenate( [s2*c1,          s2*s1          , c2],axis=2)],axis=1)
+	# R = np.concatenate([np.concatenate([c3*c2*c1-s3*s1, c3*c2*s1 + s3*c1, -c3*s2],axis=2),\
+	# 				np.concatenate([-s3*c2*c1-c3*s1,-s3*c2*s1+c3*c1 , s3*s2],axis=2),\
+	# 				np.concatenate( [s2*c1,          s2*s1          , c2],axis=2)],axis=1)
+	R = np.concatenate([np.concatenate([c1*c2*c3-s1*s3, c1*s3+c2*c3*s1 , -c3*s2],axis=2),\
+					np.concatenate([-c3*s1-c1*c2*s3,    c1*c3-c2*s1*s3 ,   s2*s3],axis=2),\
+					np.concatenate( [c1*s2,             s1*s2          ,   c2],axis=2)],axis=1)
 	# BT angles
 	# R = np.concatenate([np.concatenate([c1*c2, c2*s1, -s2],axis=2),\
 	# 				np.concatenate([c1*s2*s3-c3*s1, c1*c3+s1*s2*s3, c2*s3],axis=2),\
