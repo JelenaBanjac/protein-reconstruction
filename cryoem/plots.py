@@ -185,6 +185,41 @@ def plot_only_closest_in_SO3_space(angles, closest):
     ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
     ipv.show()
 
+def plot_rays(arr, num=None):
+    
+    ipv.clear()
+    ipv.figure(width=500, height=500)
+    num=num if num else len(arr)
+    scale = 0.2
+
+    for i in range(num):
+        ipv.scatter(arr[i:i+1,0], arr[i:i+1,1], arr[i:i+1,2], marker="sphere", color="blue", size=1)
+        ipv.scatter(arr[i,0]+arr[i:i+1,6]*scale, arr[i,1]+arr[i:i+1,7]*scale, arr[i,2]+arr[i:i+1,8]*scale, marker="sphere", color="red", size=1)
+        ipv.scatter(arr[i,0]+arr[i:i+1,9]*scale, arr[i,1]+arr[i:i+1,10]*scale, arr[i,2]+arr[i:i+1,11]*scale, marker="sphere", color="green", size=1)
+
+
+        connection0 = [arr[i,0], arr[i,0]+arr[i,6]*scale]
+        connection1 = [arr[i,1], arr[i,1]+arr[i,7]*scale]
+        connection2 = [arr[i,2], arr[i,2]+arr[i,8]*scale]
+        ipv.plot(connection0, connection1, connection2,color="red", lynestyle="--")
+        connection0 = [arr[i,0], arr[i,0]+arr[i,9]*scale]
+        connection1 = [arr[i,1], arr[i,1]+arr[i,10]*scale]
+        connection2 = [arr[i,2], arr[i,2]+arr[i,11]*scale]
+        ipv.plot(connection0, connection1, connection2,color="green", lynestyle="--")
+
+        a = arr[i,6:9]
+        b = arr[i,9:12]
+        n_corss= -np.cross(a,b)
+        connection0 = [arr[i,0], arr[i,0]+n_corss[0]]
+        connection1 = [arr[i,1], arr[i,1]+n_corss[1]]
+        connection2 = [arr[i,2], arr[i,2]+n_corss[2]]
+        ipv.plot(connection0, connection1, connection2,color="blue", lynestyle="--")
+        ipv.quiver(arr[i:i+1,0], arr[i:i+1,1], arr[i:i+1,2], 
+                 -arr[i:i+1,0]+n_corss[0], -arr[i:i+1,1]+n_corss[1], -arr[i:i+1,2]+n_corss[2], 
+                   color="blue", size=5)
+    ipv.xlim(-1,1);ipv.ylim(-1,1);ipv.zlim(-1,1)
+    ipv.show()
+
 ##################### Data Info Plots #####################
 
 def plot_angles_count(angles):
