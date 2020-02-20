@@ -185,14 +185,14 @@ def plot_only_closest_in_SO3_space(angles, closest):
     ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
     ipv.show()
 
-def plot_rays(arr, num=None):
+def plot_rays(arr, indices):
     
     ipv.clear()
     ipv.figure(width=500, height=500)
-    num=num if num else len(arr)
+    num=num if indices else range(len(arr))
     scale = 0.2
 
-    for i in range(num):
+    for i in indices:
         ipv.scatter(arr[i:i+1,0], arr[i:i+1,1], arr[i:i+1,2], marker="sphere", color="blue", size=1)
         ipv.scatter(arr[i,0]+arr[i:i+1,6]*scale, arr[i,1]+arr[i:i+1,7]*scale, arr[i,2]+arr[i:i+1,8]*scale, marker="sphere", color="red", size=1)
         ipv.scatter(arr[i,0]+arr[i:i+1,9]*scale, arr[i,1]+arr[i:i+1,10]*scale, arr[i,2]+arr[i:i+1,11]*scale, marker="sphere", color="green", size=1)
