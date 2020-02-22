@@ -185,11 +185,12 @@ def plot_only_closest_in_SO3_space(angles, closest):
     ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
     ipv.show()
 
-def plot_rays(arr, indices):
-    
+def plot_rays(angles, indices):
+    arr = RotationMatrix(angles)
+
     ipv.clear()
     ipv.figure(width=500, height=500)
-    num=num if indices else range(len(arr))
+    indices=indices if indices else range(len(arr))
     scale = 0.2
 
     for i in indices:
