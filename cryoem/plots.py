@@ -6,6 +6,7 @@ import numpy as np
 import tensorflow as tf
 import seaborn as sns; sns.set(style="white", color_codes=True)
 import pandas as pd
+from matplotlib._png import read_png
 
 fg_color = 'white'
 bg_color = 'black'
@@ -69,6 +70,7 @@ def plot_projections(images, titles, nrows=2, ncols=5):
 def save_space_plot(filename):
     ipv.save(f"{filename}.html")
     ipv.savefig(f"{filename}.png")
+
 
 def plot_euclidean_space(angles):
     ipv.clear()
@@ -220,6 +222,89 @@ def plot_rays(angles, indices):
                    color="blue", size=5)
     ipv.xlim(-1,1);ipv.ylim(-1,1);ipv.zlim(-1,1)
     ipv.show()
+
+
+def rotate_image(angles, vector):
+    # create rotation matrix
+    c1 = np.cos(angles[:,0]).reshape(-1,1,1)
+    c2 = np.cos(angles[:,1]).reshape(-1,1,1)
+    c3 = np.cos(angles[:,2]).reshape(-1,1,1)
+
+    s1 = np.sin(angles[:,0]).reshape(-1,1,1)
+    s2 = np.sin(angles[:,1]).reshape(-1,1,1)
+    s3 = np.sin(angles[:,2]).reshape(-1,1,1)
+
+    R = np.concatenate([np.concatenate([c1*c2*c3-s1*s3, c1*s3+c2*c3*s1 , -c3*s2],axis=2),\
+                    np.concatenate([-c3*s1-c1*c2*s3,    c1*c3-c2*s1*s3 ,   s2*s3],axis=2),\
+                    np.concatenate( [c1*s2,             s1*s2          ,   c2],axis=2)],axis=1)
+
+    # rotate previous values
+    for i, v in enumerate(vector):
+        vector[i] = np.matmul(R,vector[i])
+
+    return vector
+
+def _getXYZ(p1, angles, projection, img_size_scale):
+    projection = projection/np.max(projection)
+    img = np.zeros((projection.shape[0], projection.shape[1], 3))
+    img[:,:,0] = projection
+    img[:,:,1] = projection
+    img[:,:,2] = projection
+
+    x = np.linspace(-img_size_scale/2, img_size_scale/2, img.shape[0])
+    y = np.linspace(-img_size_scale/2, img_size_scale/2, img.shape[1])
+    X, Y = np.meshgrid(x, y)
+    x_shape = X.shape
+    y_shape = Y.shape
+    X = X.flatten() 
+    Y = Y.flatten()
+    
+    Z = np.zeros(X.shape)
+    vector = np.column_stack((X, Y, Z))
+    rotated_vector = rotate_image(angles, vector)
+    
+    X = rotated_vector[:,0].reshape(x_shape)+p1[0]
+    Y = rotated_vector[:,1].reshape(y_shape)+p1[1]
+    Z = rotated_vector[:,2].reshape(x_shape)+p1[2]
+    return X, Y, Z, img
+    
+def plot_images(angles, projections, indices=range(3), img_size_scale=0.05):
+    arr = RotationMatrix(angles)
+
+    ipv.clear()
+    ipv.figure(width=500, height=500)
+    indices=indices if indices else range(len(arr))
+
+    for i in indices:
+#         ipv.scatter(arr[i:i+1,0], arr[i:i+1,1], arr[i:i+1,2], marker="sphere", color="blue", size=1)
+#         ipv.scatter(arr[i,0]+arr[i:i+1,6]*scale, arr[i,1]+arr[i:i+1,7]*scale, arr[i,2]+arr[i:i+1,8]*scale, marker="sphere", color="red", size=1)
+#         ipv.scatter(arr[i,0]+arr[i:i+1,9]*scale, arr[i,1]+arr[i:i+1,10]*scale, arr[i,2]+arr[i:i+1,11]*scale, marker="sphere", color="green", size=1)
+
+
+#         connection0 = [arr[i,0], arr[i,0]+arr[i,6]*scale]
+#         connection1 = [arr[i,1], arr[i,1]+arr[i,7]*scale]
+#         connection2 = [arr[i,2], arr[i,2]+arr[i,8]*scale]
+#         ipv.plot(connection0, connection1, connection2,color="red", lynestyle="--")
+#         connection0 = [arr[i,0], arr[i,0]+arr[i,9]*scale]
+#         connection1 = [arr[i,1], arr[i,1]+arr[i,10]*scale]
+#         connection2 = [arr[i,2], arr[i,2]+arr[i,11]*scale]
+#         ipv.plot(connection0, connection1, connection2,color="green", lynestyle="--")
+
+        n_corss= -np.cross(arr[i,6:9],arr[i,9:12])
+        connection0 = [arr[i,0], arr[i,0]+n_corss[0]]
+        connection1 = [arr[i,1], arr[i,1]+n_corss[1]]
+        connection2 = [arr[i,2], arr[i,2]+n_corss[2]]
+        ipv.plot(connection0, connection1, connection2,color="blue", lynestyle="--")
+        ipv.xlim(-1,1);ipv.ylim(-1,1);ipv.zlim(-1,1)
+
+
+        X, Y, Z, img = _getXYZ(arr[i], np.array([angles[i]]), projections[i], img_size_scale=img_size_scale)
+
+        ipv.plot_surface(X, Y, Z, color=img)
+
+    
+    ipv.show()
+
 
 ##################### Data Info Plots #####################
 
