@@ -140,4 +140,6 @@ dmypy.json
 .pyre/
 
 # End of https://www.gitignore.io/api/python,jupyternotebooks
-!notebooks/data/angle_variety/fullpl_predicted*
+*.html
+*.png
+*.npy
