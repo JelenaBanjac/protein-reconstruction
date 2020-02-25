@@ -305,6 +305,32 @@ def plot_images(angles, projections, indices=range(3), img_size_scale=0.05):
     
     ipv.show()
 
+def modify_magnitude(angles):
+    arr = RotationMatrix(angles)
+    
+    # two vectors between which the angles will be calculated
+    ang_end = arr[:,6:9]
+    ang_start = np.array([np.array([1,0,0])*ang_end.shape[0]])
+    
+    # make unit vector
+    ang_start = ang_start/np.linalg.norm(ang_start, axis=1)
+    ang_end = ang_end/np.linalg.norm(ang_end, axis=1).reshape(-1, 1)
+    
+    # magnitude representing the invisible angle rotation
+    magnitude = np.arccos(np.clip(np.dot(ang_start, ang_end.T), -1, 1))
+
+    return np.multiply(arr[:,0:3], magnitude.T)
+
+def plot_angles_with_3rd_angle_magnitude(angles):
+    ipv.clear()
+
+    new_angles = modify_magnitude(angles)
+
+    ipv.figure(width=500, height=500)
+    ipv.scatter(new_angles[:,0], new_angles[:,1], new_angles[:,2], marker="sphere", color="blue", size=1)
+    ipv.xlim(-np.pi,np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi,np.pi)
+    ipv.show()
+
 
 ##################### Data Info Plots #####################
 
