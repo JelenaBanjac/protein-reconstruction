@@ -3,6 +3,7 @@ from cryoem.projections import RotationMatrix
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow_graphics.geometry.transformation import quaternion
+from tensorflow.python.framework import ops
 from time import time
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
@@ -14,6 +15,24 @@ from tensorflow_graphics.math import vector
 from scipy.interpolate import interp1d
 from cryoem.knn import get_knn_projections
 
+
+def mod_angles(e, angle_shift, angle_coverage):
+    """
+    Use:
+        angles_predicted = [tf.Variable(e, constraint=lambda x: mod_angles(x, angle_shift, angle_coverage)) for e in euler]
+    """
+    values = ops.convert_to_tensor(e.values if isinstance(e, ops.IndexedSlices) else e, name="e")
+
+    v1 = tf.math.mod(values[0], 2*np.pi)
+    v2 = tf.math.mod(values[1], np.pi)
+    v3 = tf.math.mod(values[2], 2*np.pi)
+    
+    v1 = tf.clip_by_value(v1, angle_shift[0]*np.pi, angle_shift[0]*np.pi+angle_coverage[0]*np.pi)
+    v2 = tf.clip_by_value(v2, angle_shift[1]*np.pi, angle_shift[1]*np.pi+angle_coverage[1]*np.pi)
+    v3 = tf.clip_by_value(v3, angle_shift[2]*np.pi, angle_shift[2]*np.pi+angle_coverage[2]*np.pi)
+
+
+    return tf.stack((v1, v2, v3), axis=-1)
 
 
 def sample_iter(steps, projection_idx, num_pairs, style="random", k=None):
