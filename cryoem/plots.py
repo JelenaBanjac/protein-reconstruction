@@ -332,6 +332,31 @@ def plot_angles_with_3rd_angle_magnitude(angles):
     ipv.show()
 
 
+def plot_selected_angles_with_3rd_angle_magnitude(angles, angles_true, indices):
+    ipv.clear()
+
+    angles = np.take(angles, indices, axis=0)
+    angles_true = np.take(angles_true, indices, axis=0)
+    new_angles = modify_magnitude(angles)
+    new_angles_true = modify_magnitude(angles_true)
+
+    ipv.figure(width=500, height=500)
+    ipv.scatter(new_angles[:,0], new_angles[:,1], new_angles[:,2], marker="sphere", color="red", size=1)
+    ipv.scatter(new_angles_true[:,0], new_angles_true[:,1], new_angles_true[:,2], marker="sphere", color="green", size=1)
+    
+    for i in indices:
+        connection0 = [new_angles[i,0], new_angles_true[i,0]]
+        connection1 = [new_angles[i,1], new_angles_true[i,1]]
+        connection2 = [new_angles[i,2], new_angles_true[i,2]]
+        ipv.plot(connection0, connection1, connection2,color="blue", lynestyle="--")
+    
+    
+    ipv.xlim(-np.pi,np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi,np.pi)
+    ipv.show()
+
+
+
+
 ##################### Data Info Plots #####################
 
 def plot_angles_count(angles):
