@@ -135,8 +135,6 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
 
     distance = Lambda(euclidean_distance, output_shape=eucl_dist_output_shape)([processed_a, processed_b])
 
-
-
     model = Model([input_a, input_b], distance)
 
 
@@ -144,7 +142,9 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
     #optimizer = RMSprop()
     optimizer = Adam(learning_rate=learning_rate)
 
-    model.compile(loss=mse, optimizer=optimizer, metrics=['mae'])
+    #model.compile(loss=mse, optimizer=optimizer, metrics=['mae'])
+    model.compile(loss=mae, optimizer=optimizer, metrics=['mse'])
+
 
     model.summary()
 
@@ -154,8 +154,8 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
     CHECKPOINT_PATH = f"training/{strftime('%Y%m%d_%H%M%S')}"
     pathlib.Path(CHECKPOINT_PATH).mkdir(parents=True, exist_ok=True)
     backup_callback = ModelCheckpoint(filepath=CHECKPOINT_PATH,
-                                save_weights_only=True,
-                                verbose=1)
+                                      save_weights_only=True,
+                                      verbose=1)
 
     history = model.fit([training_pairs[:, 0], training_pairs[:, 1]], training_y,
                     batch_size=batch_size,
@@ -171,8 +171,8 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
         # Get training and test loss histories
         training_loss = history.history['loss']
         val_loss = history.history['val_loss']
-        maes = history.history['mae']
-        val_maes = history.history['val_mae']
+        mses = history.history['mse']
+        val_mses = history.history['val_mse']
 
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,7))
 
@@ -180,14 +180,14 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
         epoch_count = range(1, len(training_loss) + 1)
 
         # Visualize loss history
-        ax1.plot(epoch_count, training_loss, 'r--', label='Training Loss')
-        ax1.plot(epoch_count, val_loss, 'b-', label='Validation Loss')
+        ax1.plot(epoch_count, training_loss, 'r--', label='MAE Training Loss')
+        ax1.plot(epoch_count, val_loss, 'b-', label='MAE Validation Loss')
         ax1.legend()
         ax1.set_xlabel('Epoch')
         ax1.set_ylabel('Loss')
 
-        ax2.plot(epoch_count, maes, 'r-', label='MAE Training')
-        ax2.plot(epoch_count, val_maes, 'b-', label='MAE Validation')
+        ax2.plot(epoch_count, mses, 'r-', label='MSE Training')
+        ax2.plot(epoch_count, val_mses, 'b-', label='MSE Validation')
         ax2.legend()
         ax2.set_xlabel('Epoch')
         ax2.set_ylabel('Loss')
