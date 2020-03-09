@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns; sns.set(style="white", color_codes=True)
 import random
 from tensorflow_graphics.math import vector
-from cryoem.angle_recovery import geodesic_distance
 from itertools import product
 
 
