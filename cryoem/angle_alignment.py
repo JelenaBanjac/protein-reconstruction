@@ -9,7 +9,7 @@ import seaborn as sns; sns.set(style="white", color_codes=True)
 import random
 from tensorflow_graphics.math import vector
 from itertools import product
-
+from cryoem.rotation_matrices import euler2matrix, d_r
 
 
 def lossR(a_R, a_predicted, a_true):
@@ -115,6 +115,11 @@ def distance_difference(angles_predicted, angles_true):
     q_predicted = euler2quaternion(angles_predicted)
     q_true = euler2quaternion(angles_true)
     qd = np.mean(d_q(q_predicted, q_true).numpy())
-    print("Mean quaternion distance between true and predicted values: ", qd, " rad (", np.degrees(qd), " degrees)")
+    print(f"Mean `quaternion` distance between true and predicted values: {qd:.3f} rad ({np.degrees(qd):.3f} degrees)")
 
-    return qd
+    R_predicted = euler2matrix(angles_predicted)
+    R_true = euler2matrix(angles_true)
+    rd = np.mean(d_r(R_predicted, R_true).numpy())
+    print(f"Mean `rotation matrix` distance between true and predicted values: {rd:.3f} rad ({np.degrees(rd):.3f} degrees)")
+
+    return qd, rd
