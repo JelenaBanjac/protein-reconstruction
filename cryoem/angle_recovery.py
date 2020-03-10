@@ -284,162 +284,162 @@ def train_angle_recovery(steps, batch_size, projection_idx,
     else:
         print(f"Mean loss: {np.mean(losses)}")
 
-### Error checking with alignment method
-def euclidean_distance(a,b):
-    return tf.reduce_mean(tf.norm(a-b, ord='euclidean', axis=1))
+# ### Error checking with alignment method
+# def euclidean_distance(a,b):
+#     return tf.reduce_mean(tf.norm(a-b, ord='euclidean', axis=1))
 
-def geodesic_distance(a, b):
-    return tf.reduce_mean(tf.acos(vector.dot(a, b, keepdims=False)))
+# def geodesic_distance(a, b):
+#     return tf.reduce_mean(tf.acos(vector.dot(a, b, keepdims=False)))
     
 
-def collect_points_z3(step, angles, angles_true, distance_type):
-    _ap = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        _ap[j] = [a[0]%(2*np.pi), a[1]%(2*np.pi), (a[2]+step)%(2*np.pi)]
+# def collect_points_z3(step, angles, angles_true, distance_type):
+#     _ap = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         _ap[j] = [a[0]%(2*np.pi), a[1]%(2*np.pi), (a[2]+step)%(2*np.pi)]
 
-    ats = RotationMatrix(angles_true)[:,:3]
-    aps = RotationMatrix(_ap)[:,:3]
+#     ats = RotationMatrix(angles_true)[:,:3]
+#     aps = RotationMatrix(_ap)[:,:3]
 
-    loss = distance_type(ats, aps).numpy()
+#     loss = distance_type(ats, aps).numpy()
         
-    return step, loss
+#     return step, loss
 
-def symmetric_z3(angles):
-    _ap = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        _ap[j] = [a[0]%(2*np.pi), a[1]%(2*np.pi), (-a[2])%(2*np.pi)]
+# def symmetric_z3(angles):
+#     _ap = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         _ap[j] = [a[0]%(2*np.pi), a[1]%(2*np.pi), (-a[2])%(2*np.pi)]
         
-    return _ap
+#     return _ap
 
-def symmetric_y2(angles):
-    _ap = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        _ap[j] = [a[0]%(2*np.pi), (-a[1])%(2*np.pi), a[2]%(2*np.pi)]
+# def symmetric_y2(angles):
+#     _ap = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         _ap[j] = [a[0]%(2*np.pi), (-a[1])%(2*np.pi), a[2]%(2*np.pi)]
         
-    return _ap
+#     return _ap
 
 
-def collect_points_y2(step, angles, angles_true, distance_type):
-    _ap = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        _ap[j] = [a[0]%(2*np.pi), (a[1]+step)%(2*np.pi), (a[2])%(2*np.pi)]
+# def collect_points_y2(step, angles, angles_true, distance_type):
+#     _ap = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         _ap[j] = [a[0]%(2*np.pi), (a[1]+step)%(2*np.pi), (a[2])%(2*np.pi)]
 
-    ats = RotationMatrix(angles_true)[:,:3]
-    aps = RotationMatrix(_ap)[:,:3]
+#     ats = RotationMatrix(angles_true)[:,:3]
+#     aps = RotationMatrix(_ap)[:,:3]
 
-    loss = distance_type(ats, aps).numpy()
+#     loss = distance_type(ats, aps).numpy()
         
-    return step, loss
+#     return step, loss
 
-def collect_points_z1(step, angles, angles_true, distance_type):
-    _ap = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        _ap[j] = [(a[0]+step)%(2*np.pi), (a[1])%(2*np.pi), (a[2])%(2*np.pi)]
+# def collect_points_z1(step, angles, angles_true, distance_type):
+#     _ap = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         _ap[j] = [(a[0]+step)%(2*np.pi), (a[1])%(2*np.pi), (a[2])%(2*np.pi)]
 
-    ats = RotationMatrix(angles_true)[:,:3]
-    aps = RotationMatrix(_ap)[:,:3]
+#     ats = RotationMatrix(angles_true)[:,:3]
+#     aps = RotationMatrix(_ap)[:,:3]
 
-    loss = distance_type(ats, aps).numpy()
+#     loss = distance_type(ats, aps).numpy()
         
-    return step, loss
+#     return step, loss
 
 
-def find_best_rotation_about_axis(axis_fn, distance_type, steps, angles, angles_true):
-    x = np.zeros(len(steps))
-    y = np.zeros(len(steps))
-    for i, step in enumerate(steps):
-        step, loss = axis_fn(step, angles, angles_true, distance_type)
-        x[i] = step
-        y[i] = loss
+# def find_best_rotation_about_axis(axis_fn, distance_type, steps, angles, angles_true):
+#     x = np.zeros(len(steps))
+#     y = np.zeros(len(steps))
+#     for i, step in enumerate(steps):
+#         step, loss = axis_fn(step, angles, angles_true, distance_type)
+#         x[i] = step
+#         y[i] = loss
     
-    interpolation = interp1d(x, y, kind='cubic')
-    step_new = np.linspace(min(steps), max(steps), num=100, endpoint=True)
-    loss_new = interpolation(step_new)
+#     interpolation = interp1d(x, y, kind='cubic')
+#     step_new = np.linspace(min(steps), max(steps), num=100, endpoint=True)
+#     loss_new = interpolation(step_new)
     
-    min_idx = np.argmin(loss_new)
-    min_loss = loss_new[min_idx]
-    min_step = step_new[min_idx]
+#     min_idx = np.argmin(loss_new)
+#     min_loss = loss_new[min_idx]
+#     min_step = step_new[min_idx]
     
-    plt.plot(x, y, 'o', step_new, loss_new, '--')
-    plt.legend(['data', 'cubic'], loc='best')
-    plt.show()
+#     plt.plot(x, y, 'o', step_new, loss_new, '--')
+#     plt.legend(['data', 'cubic'], loc='best')
+#     plt.show()
     
-    return min_step, min_loss 
+#     return min_step, min_loss 
 
-def find_best_rotation(angles, angles_true, steps, distance_type=euclidean_distance):
-    ### default
-    best_z3_step, min_z3_loss = find_best_rotation_about_axis(collect_points_z3, distance_type, steps, angles, angles_true)
-    print("step on z3 axis: ", best_z3_step, " loss: ", min_z3_loss, " rad (", np.degrees(min_z3_loss), " degrees)")
+# def find_best_rotation(angles, angles_true, steps, distance_type=euclidean_distance):
+#     ### default
+#     best_z3_step, min_z3_loss = find_best_rotation_about_axis(collect_points_z3, distance_type, steps, angles, angles_true)
+#     print("step on z3 axis: ", best_z3_step, " loss: ", min_z3_loss, " rad (", np.degrees(min_z3_loss), " degrees)")
     
-    # implement change on z3 axis
-    angles_updated_z3 = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        angles_updated_z3[j] = [(a[0])%(2*np.pi), (a[1])%(2*np.pi), (a[2]+best_z3_step)%(2*np.pi)]
+#     # implement change on z3 axis
+#     angles_updated_z3 = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         angles_updated_z3[j] = [(a[0])%(2*np.pi), (a[1])%(2*np.pi), (a[2]+best_z3_step)%(2*np.pi)]
     
-    best_y2_step, min_y2_loss = find_best_rotation_about_axis(collect_points_y2, distance_type, steps, angles_updated_z3, angles_true)
-    print("step on y2 axis: ", best_y2_step, " loss: ", min_y2_loss, " rad (", np.degrees(min_y2_loss), " degrees)")
+#     best_y2_step, min_y2_loss = find_best_rotation_about_axis(collect_points_y2, distance_type, steps, angles_updated_z3, angles_true)
+#     print("step on y2 axis: ", best_y2_step, " loss: ", min_y2_loss, " rad (", np.degrees(min_y2_loss), " degrees)")
     
-    ### symmetric z3
-    angles = symmetric_z3(angles)
+#     ### symmetric z3
+#     angles = symmetric_z3(angles)
     
-    symz3_best_z3_step, symz3_min_z3_loss = find_best_rotation_about_axis(collect_points_z3, distance_type, steps, angles, angles_true)
-    print("symmetric step on z3 axis: ", symz3_best_z3_step, " loss: ", symz3_min_z3_loss, " rad (", np.degrees(symz3_min_z3_loss), " degrees)")
+#     symz3_best_z3_step, symz3_min_z3_loss = find_best_rotation_about_axis(collect_points_z3, distance_type, steps, angles, angles_true)
+#     print("symmetric step on z3 axis: ", symz3_best_z3_step, " loss: ", symz3_min_z3_loss, " rad (", np.degrees(symz3_min_z3_loss), " degrees)")
     
-    # implement change on z3 axis
-    symz3_angles_updated_z3 = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        symz3_angles_updated_z3[j] = [(a[0])%(2*np.pi), (a[1])%(2*np.pi), (a[2]+best_z3_step)%(2*np.pi)]
+#     # implement change on z3 axis
+#     symz3_angles_updated_z3 = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         symz3_angles_updated_z3[j] = [(a[0])%(2*np.pi), (a[1])%(2*np.pi), (a[2]+best_z3_step)%(2*np.pi)]
     
-    symz3_best_y2_step, symz3_min_y2_loss = find_best_rotation_about_axis(collect_points_y2, distance_type, steps, symz3_angles_updated_z3, angles_true)
-    print("symmetric step on y2 axis: ", symz3_best_y2_step, " loss: ", symz3_min_y2_loss, " rad (", np.degrees(symz3_min_y2_loss), " degrees)")
+#     symz3_best_y2_step, symz3_min_y2_loss = find_best_rotation_about_axis(collect_points_y2, distance_type, steps, symz3_angles_updated_z3, angles_true)
+#     print("symmetric step on y2 axis: ", symz3_best_y2_step, " loss: ", symz3_min_y2_loss, " rad (", np.degrees(symz3_min_y2_loss), " degrees)")
     
-    ### symmetric y2
-    angles = symmetric_y2(angles)
+#     ### symmetric y2
+#     angles = symmetric_y2(angles)
     
-    symy2_best_z3_step, symy2_min_z3_loss = find_best_rotation_about_axis(collect_points_z3, distance_type, steps, angles, angles_true)
-    print("symmetric step on z3 axis: ", symy2_best_z3_step, " loss: ", symy2_min_z3_loss, " rad (", np.degrees(symy2_min_z3_loss), " degrees)")
+#     symy2_best_z3_step, symy2_min_z3_loss = find_best_rotation_about_axis(collect_points_z3, distance_type, steps, angles, angles_true)
+#     print("symmetric step on z3 axis: ", symy2_best_z3_step, " loss: ", symy2_min_z3_loss, " rad (", np.degrees(symy2_min_z3_loss), " degrees)")
     
-    # implement change on z3 axis
-    symy2_angles_updated_z3 = np.zeros(angles.shape)
-    for j, a in enumerate(angles):
-        symy2_angles_updated_z3[j] = [(a[0])%(2*np.pi), (a[1])%(2*np.pi), (a[2]+best_z3_step)%(2*np.pi)]
+#     # implement change on z3 axis
+#     symy2_angles_updated_z3 = np.zeros(angles.shape)
+#     for j, a in enumerate(angles):
+#         symy2_angles_updated_z3[j] = [(a[0])%(2*np.pi), (a[1])%(2*np.pi), (a[2]+best_z3_step)%(2*np.pi)]
     
-    symy2_best_y2_step, symy2_min_y2_loss = find_best_rotation_about_axis(collect_points_y2, distance_type, steps, symy2_angles_updated_z3, angles_true)
-    print("symmetric step on y2 axis: ", symy2_best_y2_step, " loss: ", symy2_min_y2_loss, " rad (", np.degrees(symy2_min_y2_loss), " degrees)")
+#     symy2_best_y2_step, symy2_min_y2_loss = find_best_rotation_about_axis(collect_points_y2, distance_type, steps, symy2_angles_updated_z3, angles_true)
+#     print("symmetric step on y2 axis: ", symy2_best_y2_step, " loss: ", symy2_min_y2_loss, " rad (", np.degrees(symy2_min_y2_loss), " degrees)")
     
-    idx = np.argmin(np.array([min_y2_loss, symz3_min_y2_loss, symy2_min_y2_loss]))
-    symmetries = ["no symmetry", "symmetric Z3", "symmetric Y2"]
-    step_z3 = [best_z3_step, symz3_best_z3_step, symy2_best_z3_step]
-    step_y2 = [best_y2_step, symz3_best_y2_step, symy2_best_y2_step]
+#     idx = np.argmin(np.array([min_y2_loss, symz3_min_y2_loss, symy2_min_y2_loss]))
+#     symmetries = ["no symmetry", "symmetric Z3", "symmetric Y2"]
+#     step_z3 = [best_z3_step, symz3_best_z3_step, symy2_best_z3_step]
+#     step_y2 = [best_y2_step, symz3_best_y2_step, symy2_best_y2_step]
 
-    return symmetries[idx], step_z3[idx], step_y2[idx]
+#     return symmetries[idx], step_z3[idx], step_y2[idx]
 
     
-def update_angles(ap, symmetric, z3_rotation, y2_rotation):
-    sign_z3 = -1 if symmetric=="symmetric Z3" else 1
-    sign_y2 = -1 if symmetric=="symmetric Y2" else 1
+# def update_angles(ap, symmetric, z3_rotation, y2_rotation):
+#     sign_z3 = -1 if symmetric=="symmetric Z3" else 1
+#     sign_y2 = -1 if symmetric=="symmetric Y2" else 1
     
-    _ap = np.zeros(ap.shape)
-    for j, a in enumerate(ap):
-        _ap[j] = [a[0]%(2*np.pi), (sign_y2*a[1]+y2_rotation)%(2*np.pi), (sign_z3*a[2]+z3_rotation)%(2*np.pi)]
+#     _ap = np.zeros(ap.shape)
+#     for j, a in enumerate(ap):
+#         _ap[j] = [a[0]%(2*np.pi), (sign_y2*a[1]+y2_rotation)%(2*np.pi), (sign_z3*a[2]+z3_rotation)%(2*np.pi)]
 
-    return _ap
+#     return _ap
 
-def distance_difference(angles_predicted, angles_true):
-    aps = RotationMatrix(angles_predicted)[:,:3]
-    ats = RotationMatrix(angles_true)[:,:3]
+# def distance_difference(angles_predicted, angles_true):
+#     aps = RotationMatrix(angles_predicted)[:,:3]
+#     ats = RotationMatrix(angles_true)[:,:3]
 
-    ed = euclidean_distance(ats, aps).numpy()
-    gd = geodesic_distance(ats, aps).numpy()
-    print("Euclidean distance: ", ed)
-    print("Geodesic distance: ", gd, " rad (", np.degrees(gd), " degrees)")
+#     ed = euclidean_distance(ats, aps).numpy()
+#     gd = geodesic_distance(ats, aps).numpy()
+#     print("Euclidean distance: ", ed)
+#     print("Geodesic distance: ", gd, " rad (", np.degrees(gd), " degrees)")
 
-    q_predicted = euler2quaternion(angles_predicted)
-    q_true = euler2quaternion(angles_true)
-    qd = np.mean(d_q(q_predicted, q_true).numpy())
-    print("Quaternion distance: ", qd)
+#     q_predicted = euler2quaternion(angles_predicted)
+#     q_true = euler2quaternion(angles_true)
+#     qd = np.mean(d_q(q_predicted, q_true).numpy())
+#     print("Quaternion distance: ", qd)
 
-    return ed, gd, qd
+#     return ed, gd, qd
 
 
 
