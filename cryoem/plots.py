@@ -7,6 +7,7 @@ import tensorflow as tf
 import seaborn as sns; sns.set(style="white", color_codes=True)
 import pandas as pd
 from matplotlib._png import read_png
+from cryoem.quaternions import euler2quaternion, d_q
 
 fg_color = 'white'
 bg_color = 'black'
@@ -378,6 +379,33 @@ def plot_angles_count(angles):
     sns.distplot(angles[:,0], kde=False, bins=40, ax=axs[0], axlabel="Z1 axis angle rotation [rad]", color="r")
     sns.distplot(angles[:,1], kde=False, bins=40, ax=axs[1], axlabel="Y2 axis angle rotation [rad]", color="g")
     sns.distplot(angles[:,2], kde=False, bins=40, ax=axs[2], axlabel="Z3 axis angle rotation [rad]", color="b")
+    plt.show()
+
+
+def plot_distances_count(angles_predicted, angles_true):
+    sns.set(style="white", color_codes=True)
+    sns.set(style="whitegrid")
+
+    if isinstance(angles_predicted, tf.Tensor):
+        angles_predicted = angles_predicted.numpy()
+    
+    # for i, a in enumerate(angles_predicted):
+    #     angles_predicted[i] = np.array([a[0]%(2*np.pi), a[1]%(2*np.pi), a[2]%(2*np.pi)])
+        
+    # for i, a in enumerate(angles_true):
+    #     angles_true[i] = np.array([a[0]%(2*np.pi), a[1]%(2*np.pi), a[2]%(2*np.pi)])
+    
+    q_true = euler2quaternion(angles_true)
+    q_predicted = euler2quaternion(angles_predicted)
+    distances = d_q(q_true, q_predicted)
+    
+    fig, ax = plt.subplots(figsize=(10,7))
+    ax.set_xlim(0, np.pi)
+    plt.suptitle(f"Distances between true and predicted angles\nMEAN={np.mean(distances):.2f} STD={np.std(distances):.2f}")
+    s = sns.distplot(distances, kde=False, bins=100, ax=ax, axlabel="Distance [rad]", color="r")
+    max_count = int(max([h.get_height() for h in s.patches]))
+    #ax.errorbar([np.mean(distances)]*max_count, np.arange(0, max_count, 1), xerr=np.std(distances), fmt='-o', alpha=0.5)
+    ax.plot([np.mean(distances)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
     plt.show()
 
 
