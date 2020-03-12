@@ -8,7 +8,7 @@ nohup.out
 # data 
 *.h5
 *.npy
-
+*.npz
 
 notebooks/0-preparation/data/*
 notebooks/1-phase1/data/*
