@@ -9,6 +9,7 @@ nohup.out
 *.h5
 *.npy
 *.npz
+*.mrc
 
 notebooks/0-preparation/data/*
 notebooks/1-phase1/data/*
