@@ -406,7 +406,8 @@ def plot_distances_count(angles_predicted, angles_true):
     max_count = int(max([h.get_height() for h in s.patches]))
     #ax.errorbar([np.mean(distances)]*max_count, np.arange(0, max_count, 1), xerr=np.std(distances), fmt='-o', alpha=0.5)
     ax.plot([np.mean(distances)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
-    plt.show()
+    #plt.show()
+    return plt
 
 
 def plot_dP_dQ(dP_values, dQ_values):
