@@ -8,6 +8,7 @@ import math
 def euler2quaternion(angles):
     """
     Document: https://www.sedris.org/wg8home/Documents/WG80485.pdf
+    Also:pg.25 https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19770019231.pdf
     
     Tait-Bryan angles:
         Quaternion implements 3 rotations along z-y-x axis. 
@@ -30,8 +31,9 @@ def euler2quaternion(angles):
         half_angles = a / 2.0
         cos_half_angles = tf.cos(half_angles)
         sin_half_angles = tf.sin(half_angles)
-        c1, c2, c3 = tf.unstack(cos_half_angles, axis=-1)
-        s1, s2, s3 = tf.unstack(sin_half_angles, axis=-1)
+
+        c3, c2, c1 = tf.unstack(cos_half_angles, axis=-1)
+        s3, s2, s1 = tf.unstack(sin_half_angles, axis=-1)
         # Tait-Bryan angles
         #w = c1 * c2 * c3 + s1 * s2 * s3
         #x = -c1 * s2 * s3 + s1 * c2 * c3

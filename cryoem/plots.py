@@ -130,63 +130,64 @@ def plot_only_closest_in_euclidean_space(angles, closest):
     ipv.show()
  
 
-def plot_SO3_space(angles, rotation_axes="zyz", normalized=False):
-    """ zyz - intrinsic rotation ()
-        ZYZ - extrinsic rotation (rotates about axes of motionless coordinate system)
-    """
-    ipv.clear()
+# def plot_SO3_space(angles, rotation_axes="zyz", normalized=False):
+#     """ zyz - intrinsic rotation ()
+#         ZYZ - extrinsic rotation (rotates about axes of motionless coordinate system)
+#     """
+#     ipv.clear()
 
-    if isinstance(angles[0], tf.Variable):
-        angles = np.array([a.numpy() for a in angles])
+#     if isinstance(angles[0], tf.Variable):
+#         angles = np.array([a.numpy() for a in angles])
 
-    rotation_vectors = R.from_euler(seq=rotation_axes, angles=angles).as_rotvec()
-    magnitude = np.linalg.norm(rotation_vectors, axis=1)
+#     rotation_vectors = R.from_euler(seq=rotation_axes, angles=angles).as_rotvec()
+#     magnitude = np.linalg.norm(rotation_vectors, axis=1)
 
-    if normalized:
-        rotation_vectors /= magnitude[:, np.newaxis]
-        ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
-    else:
-        ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
+#     if normalized:
+#         rotation_vectors /= magnitude[:, np.newaxis]
+#         ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
+#     else:
+#         ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
 
-    ipv.figure(width=500, height=500)
-    ipv.scatter(rotation_vectors[:,0], rotation_vectors[:,1], rotation_vectors[:,2], marker="sphere", color="blue", size=1)
+#     ipv.figure(width=500, height=500)
+#     ipv.scatter(rotation_vectors[:,0], rotation_vectors[:,1], rotation_vectors[:,2], marker="sphere", color="blue", size=1)
     
-    ipv.show()
+#     ipv.show()
 
 
-def plot_one_closest_vs_all_in_SO3_space(angles, closest):
-    ipv.clear()
-    rotation_vectors = R.from_euler(seq="zyz", angles=angles).as_rotvec()
-    magnitude = np.linalg.norm(rotation_vectors, axis=1)
+# def plot_one_closest_vs_all_in_SO3_space(angles, closest):
+#     ipv.clear()
+#     rotation_vectors = R.from_euler(seq="zyz", angles=angles).as_rotvec()
+#     magnitude = np.linalg.norm(rotation_vectors, axis=1)
 
-    knn = np.take(rotation_vectors, closest, axis=0)
-    all = np.delete(rotation_vectors, closest, 0)
+#     knn = np.take(rotation_vectors, closest, axis=0)
+#     all = np.delete(rotation_vectors, closest, 0)
 
-    ipv.figure(width=500, height=400)
-    ipv.scatter(knn[:,0], knn[:,1], knn[:,2], marker="diamond", color="red", size=1.5)
-    ipv.scatter(all[:,0], all[:,2], all[:,1], marker="sphere", color="blue", size=1)
-    ipv.show()
+#     ipv.figure(width=500, height=400)
+#     ipv.scatter(knn[:,0], knn[:,1], knn[:,2], marker="diamond", color="red", size=1.5)
+#     ipv.scatter(all[:,0], all[:,2], all[:,1], marker="sphere", color="blue", size=1)
+#     ipv.show()
 
-def plot_only_closest_in_SO3_space(angles, closest):
-    ipv.clear()
-    rotation_vectors = R.from_euler(seq="zyz", angles=angles).as_rotvec()
-    magnitude = np.linalg.norm(rotation_vectors, axis=1)
+# def plot_only_closest_in_SO3_space(angles, closest):
+#     ipv.clear()
+#     rotation_vectors = R.from_euler(seq="zyz", angles=angles).as_rotvec()
+#     magnitude = np.linalg.norm(rotation_vectors, axis=1)
 
-    for i in closest:
-        main = np.array([rotation_vectors[i[0]]])
-        knn = np.take(rotation_vectors, i[1:], axis=0)
+#     for i in closest:
+#         main = np.array([rotation_vectors[i[0]]])
+#         knn = np.take(rotation_vectors, i[1:], axis=0)
         
-        ipv.scatter(main[:,0], main[:,1], main[:,2], marker="diamond", color="red", size=1.5)
-        ipv.scatter(knn[:,0], knn[:,1], knn[:,2], marker="sphere", color="blue", size=1)
+#         ipv.scatter(main[:,0], main[:,1], main[:,2], marker="diamond", color="red", size=1.5)
+#         ipv.scatter(knn[:,0], knn[:,1], knn[:,2], marker="sphere", color="blue", size=1)
         
-        for c in range(5):
-            connection0 = [main[:,0][0], knn[c,0]]
-            connection1 = [main[:,1][0], knn[c,1]]
-            connection2 = [main[:,2][0], knn[c,2]]
-            ipv.plot(connection0, connection1, connection2,color="red", lynestyle="--")
+#         for c in range(5):
+#             connection0 = [main[:,0][0], knn[c,0]]
+#             connection1 = [main[:,1][0], knn[c,1]]
+#             connection2 = [main[:,2][0], knn[c,2]]
+#             ipv.plot(connection0, connection1, connection2,color="red", lynestyle="--")
         
-    ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
-    ipv.show()
+#     ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi,np.pi);ipv.zlim(-np.pi, np.pi)
+#     ipv.show()
+
 
 def plot_rays(angles, indices):
     arr = RotationMatrix(angles)
@@ -411,6 +412,7 @@ def plot_distances_count(angles_predicted, angles_true):
 
 
 def plot_dP_dQ(dP_values, dQ_values):
+    plt.clf()
 
     # Creating the dataframe for SNS plot
     data = {"d_Q" : dQ_values, #tr_y.numpy(),
@@ -431,6 +433,7 @@ def plot_dP_dQ(dP_values, dQ_values):
     plt.show();
 
 def plot_dP_dQ_density(dP_values, dQ_values):
+    plt.clf()
 
     # Creating the dataframe for SNS plot
     data = {"d_Q" : dQ_values, #tr_y.numpy(),
