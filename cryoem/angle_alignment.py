@@ -111,7 +111,7 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
     losses = np.empty(steps)
     angles_predicted = tf.convert_to_tensor(angles_predicted)
 
-    euler = np.zeros(6, dtype=np.float64)
+    euler = tf.random.uniform([6], 0, 2*np.pi, dtype=tf.float64) #np.zeros(6, dtype=np.float64)
     a_R = [tf.Variable(euler)]
     
     q_predicted = euler2quaternion(angles_predicted)
@@ -179,6 +179,9 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
         if ((step % (steps//10)) == 0) or (step == steps):
             time_elapsed = time.time() - time_start
             report += f'step {step}/{steps} ({time_elapsed:.0f}s): loss = {np.mean(losses[step-steps//10:step-1]):.2e}\n'
+
+        if step >= 101 and np.mean(losses[step-101:step-1]) < 1e-3:
+            break;
 
     print(report)
     return m, a_R, np.mean(losses[-1-steps//10:-1])
