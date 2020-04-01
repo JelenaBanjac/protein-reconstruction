@@ -184,10 +184,8 @@ def d_q(q1, q2):
     dot_product = vector.dot(q1, q2, keepdims=False)
     
     # Ensure dot product is in range [-1. 1].
-    const = 1.8 #4.0 #.63
-    eps_dot_prod = const * asserts.select_eps_for_addition(dot_product.dtype)
-    dot_product = safe_ops.safe_shrink(
-        dot_product, -1, 1, open_bounds=False, eps=eps_dot_prod)
+    eps_dot_prod = 1.8 * asserts.select_eps_for_addition(dot_product.dtype)
+    dot_product = safe_ops.safe_shrink(dot_product, -1, 1, open_bounds=False, eps=eps_dot_prod)
 
     return 2.0 * tf.acos(tf.abs(dot_product)) 
 
