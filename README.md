@@ -32,6 +32,9 @@ $ conda activate protein_reconstruction
 ```
 # tensorflow check
 $ python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
+# o/w install with: 
+$ pip3 install tensorflow-gpu
+$ pip3 install tensorflow-graphics
 
 # astra toolbox check
 $ python3 -c "import astra;astra.test_CUDA()"
