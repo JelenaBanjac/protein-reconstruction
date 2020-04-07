@@ -18,7 +18,7 @@ def distance_difference(angles_predicted, angles_true):
 
     return qd #, rd
 
-def euler2quaternion(angles, transposed=True):
+def euler2quaternion(angles, transposed=False):
     
     angles = tf.convert_to_tensor(value=angles)
 
@@ -80,7 +80,7 @@ def euler2quaternion(angles, transposed=True):
     
     return tf.stack((x, y, z, w), axis=-1)
 
-def quaternion2euler(quaternions, transposed=True):
+def quaternion2euler(quaternions, transposed=False):
     """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
     
     def general_case(r02, r12, r20, r21, r22, eps_addition):
@@ -189,7 +189,7 @@ def d_q(q1, q2):
 
     return 2.0 * tf.acos(tf.abs(dot_product)) 
 
-def quaternion2matrix(quaternions, transposed=True):
+def quaternion2matrix(quaternions, transposed=False):
     """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
 
     quaternions = tf.convert_to_tensor(value=quaternions)
@@ -247,7 +247,7 @@ def quaternion2matrix(quaternions, transposed=True):
     
     return R
 
-def matrix2quaternion(R, transposed=True):
+def matrix2quaternion(R, transposed=False):
     R = tf.convert_to_tensor(value=R)
     
     R = tf.reshape(R, [-1, 9])
@@ -280,7 +280,7 @@ def matrix2quaternion(R, transposed=True):
     
     return tf.stack((x, y, z, w), axis=-1)
 
-def euler2matrix(angles, transposed=True):
+def euler2matrix(angles, transposed=False):
     
     angles = tf.convert_to_tensor(value=angles, dtype=tf.float64)
 
@@ -323,7 +323,7 @@ def euler2matrix(angles, transposed=True):
     
     return R
 
-def matrix2euler(R, transposed=True):
+def matrix2euler(R, transposed=False):
     """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
     
     def general_case(r02, r12, r20, r21, r22, eps_addition):

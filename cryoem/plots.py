@@ -447,7 +447,7 @@ def plot_dP_dQ(dP_values, dQ_values):
     # df2 = pd.DataFrame(data=data)
 
     plt.clf();
-    fig, ax = plt.subplots(1, 1, figsize=(15,10));
+    fig, ax = plt.subplots(1, 1, figsize=(6,6));
     sns.scatterplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", ax=ax);  # "reg", "kde"
     #sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde", ax=ax[1]);  # "reg", "kde"
     x = np.arange(0, np.pi);
@@ -468,7 +468,6 @@ def plot_dP_dQ_density(dP_values, dQ_values):
     # df2 = pd.DataFrame(data=data)
 
     plt.clf();
-    #fig, ax = plt.subplots(1, 1, figsize=(15,10));
     #sns.scatterplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", ax=ax[0]);  # "reg", "kde"
     sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde");  # "reg", "kde"
     plt.show();

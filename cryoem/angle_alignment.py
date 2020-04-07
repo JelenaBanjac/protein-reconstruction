@@ -76,7 +76,7 @@ def euler6tomarix4d(a_R):
     return R
 
 
-def update_quaternion(m, a_R, q_predicted, transposed=True):
+def update_quaternion(m, a_R, q_predicted):
     # 4D matrix rotation
     R = euler6tomarix4d(a_R)
     I = tf.linalg.diag(tf.convert_to_tensor(m, dtype=tf.float64))
@@ -84,7 +84,7 @@ def update_quaternion(m, a_R, q_predicted, transposed=True):
 
     return q_predicted_rotated
 
-def loss_alignment(m, a_R, q_predicted, q_true, transposed):
+def loss_alignment(m, a_R, q_predicted, q_true):
     # 4D matrix rotation
     R = euler6tomarix4d(a_R)
     I = tf.linalg.diag(tf.convert_to_tensor(m, dtype=tf.float64))
@@ -93,15 +93,15 @@ def loss_alignment(m, a_R, q_predicted, q_true, transposed):
     return tf.reduce_mean(d_q(q_true, q_predicted_rotated))
 
 
-def gradient_alignment(m, a_R, q_predicted, q_true, transposed):
+def gradient_alignment(m, a_R, q_predicted, q_true):
     with tf.GradientTape() as tape:
-        loss_value = loss_alignment(m, a_R, q_predicted, q_true, transposed)
+        loss_value = loss_alignment(m, a_R, q_predicted, q_true)
         gradient = tape.gradient(loss_value, a_R)
         
     return loss_value, gradient
 
 
-def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate, angles_true, angles_predicted, transposed=True):
+def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate, angles_true, angles_predicted):
     
     with tf.device('/device:GPU:0'):
         optimizer = Adam(learning_rate=learning_rate)
@@ -129,7 +129,7 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
             qp = [q_predicted[i] for i in idx]
 
             # Optimize by gradient descent.
-            losses[step-1], gradients = gradient_alignment(m, a_R, qp, qt, transposed)
+            losses[step-1], gradients = gradient_alignment(m, a_R, qp, qt)
             optimizer.apply_gradients(zip(gradients, a_R))
             
             update_lr = 300
@@ -145,7 +145,7 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
                 fig, axs = plt.subplots(1, 3, figsize=(24,7))
                 
                 # Distance count subplot (batches)
-                qpr = update_quaternion(m, a_R, qp, transposed=transposed)
+                qpr = update_quaternion(m, a_R, qp)
                 d1 = d_q(qpr, qt)
                 axs[0].set_xlim(0, np.pi)
                 #axs[0].set_ylim(0, batch_size)
@@ -161,7 +161,7 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
                 axs[1].set_title(f"Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
                 
                 # Distance count subplot (full)
-                q_predicted_rot = update_quaternion(m, a_R, q_predicted, transposed=transposed)
+                q_predicted_rot = update_quaternion(m, a_R, q_predicted)
                 d2 = d_q(q_predicted_rot, q_true)
                 axs[2].set_xlim(0, np.pi)
                 # axs[2].set_ylim(0, len(angles_true))
