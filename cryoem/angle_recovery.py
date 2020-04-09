@@ -7,6 +7,7 @@ import seaborn as sns; sns.set(style="white", color_codes=True)
 from tensorflow_graphics.geometry.transformation import quaternion
 from cryoem.conversions import euler2quaternion, d_q, quaternion2euler
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 def train_angle_recovery(steps, batch_size, projection_idx, 
                         in_data, distance_fn, angles_predicted=None,
@@ -20,7 +21,7 @@ def train_angle_recovery(steps, batch_size, projection_idx,
     high_ang = [2.0*np.pi, 0.4*np.pi, 2.0*np.pi]            
     euler = np.random.uniform(low=[low_ang[0], low_ang[1], low_ang[2]], 
                           high=[high_ang[0], high_ang[1], high_ang[2]],
-                          size=(len(angles_true), 3))
+                          size=(len(in_data), 3))
     q_predicted = [tf.Variable(q) for q in euler2quaternion(euler)]
 #     q_predicted = [tf.Variable(tf.cast(quaternion.normalized_random_uniform((1,)), dtype=tf.float64)) for _ in range(len(in_data))]
     
@@ -98,7 +99,7 @@ def train_angle_recovery(steps, batch_size, projection_idx,
         if step >= 1001 and np.mean(losses[step-1001:step-1]) < 1e-8:
             found_minimizer = True
             
-        if step >= 1001 and np.abs(np.mean(losses[step-100:step-1])-np.mean(losses[step-200:step-100])) < 1e-7:
+        if step >= 2001 and np.abs(np.mean(losses[step-1000:step-1])-np.mean(losses[step-2000:step-1000])) < 1e-7:
             found_minimizer = True
             
     print(report)

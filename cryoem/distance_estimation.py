@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 import pathlib
 
 from cryoem.projections import RotationMatrix
-from cryoem.quaternions import euler2quaternion, d_q
+from cryoem.conversions import euler2quaternion, d_q
 from cryoem.knn import get_knn_projections
 
 import random
@@ -156,12 +156,16 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
     backup_callback = ModelCheckpoint(filepath=CHECKPOINT_PATH,
                                       save_weights_only=True,
                                       verbose=1)
+    # Create a callback that will show tensorboard data
+    LOGS_PATH = f"logs/{strftime('%Y%m%d_%H%M%S')}"
+    pathlib.Path(LOGS_PATH).mkdir(parents=True, exist_ok=True)
+    logs_callback = TensorBoard(LOGS_PATH, histogram_freq=1)
 
     history = model.fit([training_pairs[:, 0], training_pairs[:, 1]], training_y,
                     batch_size=batch_size,
                     epochs=epochs,
                     validation_data=([validation_pairs[:, 0], validation_pairs[:, 1]], validation_y),
-                    callbacks=[backup_callback])
+                    callbacks=[backup_callback, logs_callback])
 
     model_filename = f"training/{strftime('%Y%m%d_%H%M%S')}.h5"
     model.save(model_filename) 
