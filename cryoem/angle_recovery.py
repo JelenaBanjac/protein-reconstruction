@@ -56,30 +56,30 @@ def train_angle_recovery(steps, batch_size, projection_idx,
                 sns.set(style="white", color_codes=True)
                 sns.set(style="whitegrid")
 
-                fig, axs = plt.subplots(1, 3, figsize=(24,7))
+                fig, axs = plt.subplots(figsize=(10,7))
 
                 # Optimization loss subplot
-                axs[0].plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
-                axs[0].set_xlabel('time [s]')
-                axs[0].set_ylabel('loss');
-                axs[0].set_title(f"Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
+                axs.plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
+                axs.set_xlabel('time [s]')
+                axs.set_ylabel('loss');
+                axs.set_title(f"Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
 
                 # T - Distance count subplot (full)
-                d2 = d_q(in_data, q_predicted)
-                axs[1].set_xlim(0, np.pi)
-                axs[1].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
-                s = sns.distplot(d2, kde=False, bins=100, ax=axs[1], axlabel="Distance [rad]", color="r")
-                max_count = int(max([h.get_height() for h in s.patches]))
-                axs[1].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+                #d2 = d_q(in_data, q_predicted)
+                #axs[1].set_xlim(0, np.pi)
+                #axs[1].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
+                #s = sns.distplot(d2, kde=False, bins=100, ax=axs[1], axlabel="Distance [rad]", color="r")
+                #max_count = int(max([h.get_height() for h in s.patches]))
+                #axs[1].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
                 
                 # NT - Distance count subplot (full)
-                q_predicted_T = euler2quaternion(quaternion2euler(q_predicted, transposed=True))
-                d2 = d_q(in_data, q_predicted_T)
-                axs[2].set_xlim(0, np.pi)
-                axs[2].set_title(f"FULL: [{step}/{steps}] TRANSPOSED Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
-                s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
-                max_count = int(max([h.get_height() for h in s.patches]))
-                axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+                #q_predicted_T = euler2quaternion(quaternion2euler(q_predicted, transposed=True))
+                #d2 = d_q(in_data, q_predicted_T)
+                #axs[2].set_xlim(0, np.pi)
+                #axs[2].set_title(f"FULL: [{step}/{steps}] TRANSPOSED Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
+                #s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
+                #max_count = int(max([h.get_height() for h in s.patches]))
+                #axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
 
                 IPyDisplay.clear_output(wait=True)
                 IPyDisplay.display(plt.gcf())
