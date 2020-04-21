@@ -91,7 +91,10 @@ def create_base_network(input_shape):
     #print(input_shape)
 
     # add Convolution, MaxPool, Conv2D, remove Dropout and Dense
-    x = Conv2D(filters=32, kernel_size=[7, 7], activation='relu', padding='same', kernel_initializer='glorot_uniform')(input_x)
+    x = Conv2D(filters=16, kernel_size=[9, 9], activation='relu', padding='same', kernel_initializer='glorot_uniform')(input_x)
+    x = MaxPooling2D([2, 2], padding='same')(x)
+
+    x = Conv2D(filters=32, kernel_size=[7, 7], activation='relu', padding='same', kernel_initializer='glorot_uniform')(x)
     x = MaxPooling2D([2, 2], padding='same')(x)
 
     x = Conv2D(64, [5, 5], activation='relu', padding='same', kernel_initializer='glorot_uniform')(x)
@@ -197,8 +200,7 @@ def train_siamese(training_pairs, training_y, validation_pairs, validation_y, ep
         ax2.set_ylabel('Loss')
         plt.show();
 
-    return model
-
+    return model, history
 
 def plot_results(projections, y_pred, y, strtype):
     if projections.shape[-1] == 1:

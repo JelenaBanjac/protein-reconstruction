@@ -18,7 +18,7 @@ def distance_difference(angles_predicted, angles_true):
 
     return qd #, rd
 
-def euler2quaternion(angles, transposed=False):
+def euler2quaternion(angles):
     
     angles = tf.convert_to_tensor(value=angles)
 
@@ -35,28 +35,16 @@ def euler2quaternion(angles, transposed=False):
     s2 = tf.sin(theta_y)
     s3 = tf.sin(theta_z0)
 
-    if not transposed:
-        r00 = c1*c2*c3-s1*s3
-        r10 = c1*s3+c2*c3*s1
-        r20 = -c3*s2
-        r01 = -c3*s1-c1*c2*s3
-        r11 = c1*c3-c2*s1*s3
-        r21 = s2*s3
-        r02 = c1*s2
-        r12 = s1*s2 
-        r22 = c2
-
-    else:
-        # PROJECTIONS CODE
-        r00 = c1*c2*c3-s1*s3
-        r01 = c1*s3+c2*c3*s1
-        r02 = -c3*s2
-        r10 = -c3*s1-c1*c2*s3
-        r11 = c1*c3-c2*s1*s3
-        r12 = s2*s3
-        r20 = c1*s2
-        r21 = s1*s2 
-        r22 = c2
+    # PROJECTIONS CODE
+    r00 = c1*c2*c3-s1*s3
+    r01 = -(c1*s3+c2*c3*s1) ##
+    r02 = -(-c3*s2)  ##
+    r10 = -(-c3*s1-c1*c2*s3) ##
+    r11 = c1*c3-c2*s1*s3
+    r12 = s2*s3
+    r20 = -(c1*s2) ##
+    r21 = s1*s2 
+    r22 = c2
 
     w2 = 1/4*(1+ r00 + r11 + r22)
     w2_is_pos = tf.greater(w2, 0)
@@ -80,7 +68,7 @@ def euler2quaternion(angles, transposed=False):
     
     return tf.stack((x, y, z, w), axis=-1)
 
-def quaternion2euler(quaternions, transposed=False):
+def quaternion2euler(quaternions):
     """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
     
     def general_case(r02, r12, r20, r21, r22, eps_addition):
@@ -93,7 +81,7 @@ def quaternion2euler(quaternions, transposed=False):
         
         theta_z0 = tf.atan2(r12, r02)
         theta_z1 = tf.atan2(r21, -r20)
-        return tf.stack((theta_z0, theta_y, theta_z1), axis=-1)
+        return tf.stack((theta_z1, theta_y, theta_z0), axis=-1)
 
     def gimbal_lock(r22, r11, r10, eps_addition):
         """Handles Gimbal locks.
@@ -105,7 +93,7 @@ def quaternion2euler(quaternions, transposed=False):
         
         theta_y = tf.constant(math.pi/2.0, dtype=r20.dtype) - sign_r22 * tf.constant(math.pi/2.0, dtype=r20.dtype)
         theta_z1 = tf.zeros_like(theta_z0)
-        angles = tf.stack((theta_z0, theta_y, theta_z1), axis=-1)
+        angles = tf.stack((theta_z1, theta_y, theta_z0), axis=-1)
         return angles
 
     with tf.compat.v1.name_scope(None, "euler_from_quaternion", [quaternions]):
@@ -133,31 +121,17 @@ def quaternion2euler(quaternions, transposed=False):
         # The following is clipped due to numerical instabilities that can take some
         # enties outside the [-1;1] range.
         
-        if not transposed:
-            r00 = safe_ops.safe_shrink(1.0 - (tyy + tzz), -1.0, 1.0, True)
-            r01 = safe_ops.safe_shrink(txy - twz, -1.0, 1.0, True)
-            r02 = safe_ops.safe_shrink(txz + twy, -1.0, 1.0, True)
+        r00 = safe_ops.safe_shrink(1.0 - (tyy + tzz), -1.0, 1.0, True)
+        r01 = safe_ops.safe_shrink(txy - twz, -1.0, 1.0, True)
+        r02 = safe_ops.safe_shrink(txz + twy, -1.0, 1.0, True)
 
-            r10 = safe_ops.safe_shrink(txy + twz, -1.0, 1.0, True)
-            r11 = safe_ops.safe_shrink(1.0 - (txx + tzz), -1.0, 1.0, True)
-            r12 = safe_ops.safe_shrink(tyz - twx, -1.0, 1.0, True)
+        r10 = safe_ops.safe_shrink(txy + twz, -1.0, 1.0, True)
+        r11 = safe_ops.safe_shrink(1.0 - (txx + tzz), -1.0, 1.0, True)
+        r12 = safe_ops.safe_shrink(tyz - twx, -1.0, 1.0, True)
 
-            r20 = safe_ops.safe_shrink(txz - twy, -1.0, 1.0, True)
-            r21 = safe_ops.safe_shrink(tyz + twx, -1.0, 1.0, True)
-            r22 = safe_ops.safe_shrink(1.0 - (txx + tyy), -1.0, 1.0, True)
-        
-        else:
-            r00 = safe_ops.safe_shrink(1.0 - (tyy + tzz), -1.0, 1.0, True)
-            r01 = safe_ops.safe_shrink(txy + twz, -1.0, 1.0, True)
-            r02 = safe_ops.safe_shrink(txz - twy, -1.0, 1.0, True)
-
-            r10 = safe_ops.safe_shrink(txy - twz, -1.0, 1.0, True)
-            r11 = safe_ops.safe_shrink(1.0 - (txx + tzz), -1.0, 1.0, True)
-            r12 = safe_ops.safe_shrink(tyz + twx, -1.0, 1.0, True)
-
-            r20 = safe_ops.safe_shrink(txz + twy, -1.0, 1.0, True)
-            r21 = safe_ops.safe_shrink(tyz - twx, -1.0, 1.0, True)
-            r22 = safe_ops.safe_shrink(1.0 - (txx + tyy), -1.0, 1.0, True)
+        r20 = safe_ops.safe_shrink(txz - twy, -1.0, 1.0, True)
+        r21 = safe_ops.safe_shrink(tyz + twx, -1.0, 1.0, True)
+        r22 = safe_ops.safe_shrink(1.0 - (txx + tyy), -1.0, 1.0, True)
         
         eps_addition = asserts.select_eps_for_addition(quaternions.dtype)
         general_solution = general_case(r02, r12, r20, r21, r22, eps_addition)
@@ -169,7 +143,7 @@ def quaternion2euler(quaternions, transposed=False):
         is_gimbal = tf.less(tf.abs(tf.abs(r22) - 1.0), 1.0e-6)
         gimbal_mask = tf.stack((is_gimbal, is_gimbal, is_gimbal), axis=-1)
         
-        return tf.compat.v1.where(gimbal_mask, gimbal_solution, general_solution)          
+        return tf.compat.v1.where(gimbal_mask, gimbal_solution, general_solution)             
     
 def d_q(q1, q2):
     q1 = tf.cast(tf.convert_to_tensor(value=q1), dtype=tf.float64)

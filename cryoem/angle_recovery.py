@@ -8,13 +8,26 @@ from tensorflow_graphics.geometry.transformation import quaternion
 from cryoem.conversions import euler2quaternion, d_q, quaternion2euler
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from scipy.spatial.transform import Rotation as R
 
-def train_angle_recovery(steps, batch_size, projection_idx, 
-                        in_data, distance_fn, angles_predicted=None,
-                        learning_rate=0.01, 
-                        optimization=False): 
-    time_start = time.time()
+
+def angles_transpose(angles):
+    angles[:,[0, 2]] = angles[:,[2, 0]]
+    angles *= -1
+    return angles
+
+
+def train_angle_recovery(steps, 
+                         batch_size, 
+                         in_data, 
+                         distance_fn, 
+                         angles_predicted=None,
+                         angles_true=None,
+                         learning_rate=0.01, 
+                         optimization=False): 
     
+    time_start = time.time()
+    collect_data = []
     optimizer = Adam(learning_rate=learning_rate)
     
     low_ang = [0.0*np.pi, 0.0*np.pi, 0.0*np.pi]
@@ -29,12 +42,12 @@ def train_angle_recovery(steps, batch_size, projection_idx,
         in_data = euler2quaternion(in_data)
     
     losses = np.empty(steps)
-    report = ""
+    report = f"Shape of projections: {in_data.shape}"
     found_minimizer = False
     
     print(time.time()-time_start)
     
-    for step, idx1, idx2 in sample_iter(steps, projection_idx, batch_size, style="random"):
+    for step, idx1, idx2 in sample_iter(steps, range(len(in_data)), batch_size, style="random"):
         #q_predicted = quaternion.normalize(q_predicted)
         q1 = [q_predicted[i] for i in idx1]
         q2 = [q_predicted[i] for i in idx2]
@@ -52,41 +65,58 @@ def train_angle_recovery(steps, batch_size, projection_idx,
             
             # Visualize progress periodically
             if step % 10 == 0:
+                a = np.zeros((len(q_predicted), 3))
+                for i, e in enumerate(q_predicted):
+                    a[i] = R.from_quat(e.numpy()).as_rotvec()
+                collect_data.append(a)
+                
                 plt.close();
                 sns.set(style="white", color_codes=True)
                 sns.set(style="whitegrid")
-
-                fig, axs = plt.subplots(1, 3, figsize=(24,7))
-
-                # Optimization loss subplot
-                axs[0].plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
-                axs[0].set_xlabel('time [s]')
-                axs[0].set_ylabel('loss');
-                axs[0].set_title(f"Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
-
-                # T - Distance count subplot (full)
-                d2 = d_q(in_data, q_predicted)
-                axs[1].set_xlim(0, np.pi)
-                axs[1].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
-                s = sns.distplot(d2, kde=False, bins=100, ax=axs[1], axlabel="Distance [rad]", color="r")
-                max_count = int(max([h.get_height() for h in s.patches]))
-                axs[1].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
                 
-                # NT - Distance count subplot (full)
-                q_predicted_T = euler2quaternion(quaternion2euler(q_predicted, transposed=True))
-                d2 = d_q(in_data, q_predicted_T)
-                axs[2].set_xlim(0, np.pi)
-                axs[2].set_title(f"FULL: [{step}/{steps}] TRANSPOSED Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
-                s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
-                max_count = int(max([h.get_height() for h in s.patches]))
-                axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+                if angles_true is not None:
+                    fig, axs = plt.subplots(1, 3, figsize=(24,7))
 
+                    # Optimization loss subplot
+                    axs[0].plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
+                    axs[0].set_xlabel('time [s]')
+                    axs[0].set_ylabel('loss');
+                    axs[0].set_title(f"[{step}/{steps}] Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
+
+                    # NT - Distance count subplot (full)
+                    d2 = d_q(R.from_euler('zyz', angles_true).as_quat(), q_predicted)
+                    axs[1].set_xlim(0, np.pi)
+                    axs[1].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
+                    s = sns.distplot(d2, kde=False, bins=100, ax=axs[1], axlabel="Distance [rad]", color="r")
+                    max_count = int(max([h.get_height() for h in s.patches]))
+                    axs[1].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+
+                    # T - Distance count subplot (full)
+                    angles_true_T = angles_transpose(angles_true)
+                    d2 = d_q(R.from_euler('zyz', angles_true_T).as_quat(), q_predicted)
+                    axs[2].set_xlim(0, np.pi)
+                    axs[2].set_title(f"FULL: [{step}/{steps}] TRANSPOSED Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
+                    s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
+                    max_count = int(max([h.get_height() for h in s.patches]))
+                    axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+                else:
+                    fig, axs = plt.subplots(figsize=(10,7))
+
+                    # Optimization loss subplot
+                    axs.plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
+                    axs.set_xlabel('time [s]')
+                    axs.set_ylabel('loss');
+                    axs.set_title(f"[{step}/{steps}] Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
+
+                    
                 IPyDisplay.clear_output(wait=True)
                 IPyDisplay.display(plt.gcf())
                 plt.close();
-                time.sleep(1.0)
+                time.sleep(0.1)
                 
                 if found_minimizer:
+                    time_elapsed = time.time() - time_start
+                    report += f'step {step}/{steps} ({time_elapsed:.0f}s): loss = {losses[step-1]:.2e}\n'
                     break;
         else:
             losses[step-1] = loss(a1, a2, distance_target)
@@ -103,7 +133,7 @@ def train_angle_recovery(steps, batch_size, projection_idx,
             found_minimizer = True
             
     print(report)
-    return losses, quaternion.normalize(q_predicted)
+    return quaternion.normalize(q_predicted), losses, np.array(collect_data)
         
 def sample_iter(steps, projection_idx, num_pairs, style="random", k=None):
 

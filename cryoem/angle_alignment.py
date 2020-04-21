@@ -12,6 +12,8 @@ from itertools import product
 from cryoem.rotation_matrices import euler2matrix, d_r
 import time
 from IPython import display as IPyDisplay
+from scipy.spatial.transform import Rotation as R
+
 
 def euler6tomarix4d(a_R):
 
@@ -101,9 +103,11 @@ def gradient_alignment(m, a_R, q_predicted, q_true):
     return loss_value, gradient
 
 
-def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate, angles_true, angles_predicted):
+def training_angle_alignment(m, steps, batch_size, learning_rate, angles_true, angles_predicted):
     
     with tf.device('/device:GPU:0'):
+        arr = []
+        
         optimizer = Adam(learning_rate=learning_rate)
         
         time_start = time.time()
@@ -122,7 +126,7 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
         for step in range(1, steps+1):
 
             # Sample some pairs.
-            idx = list(np.random.choice(projection_idx, size=batch_size))
+            idx = list(np.random.choice(range(len(angles_predicted)), size=batch_size))
 
             # Compute distances between projections
             qt = [q_true[i]      for i in idx]
@@ -138,6 +142,10 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
 
             # Visualize progress periodically
             if step % 10 == 0:
+                qu = update_quaternion(m, a_R, q_predicted)
+                
+                arr.append(R.from_quat(update_quaternion(m, a_R, q_predicted)).as_rotvec())
+                
                 plt.close();
                 sns.set(style="white", color_codes=True)
                 sns.set(style="whitegrid")
@@ -186,4 +194,4 @@ def training_angle_alignment(m, steps, batch_size, projection_idx, learning_rate
                 break;
 
         print(report)
-        return m, a_R, np.mean(losses[-1-steps//10:-1])
+        return m, a_R, losses, np.array(arr)
