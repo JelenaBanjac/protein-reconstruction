@@ -129,6 +129,73 @@ def plot_only_closest_in_euclidean_space(angles, closest):
     ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
     ipv.show()
  
+def plot_iterations_polar_plot(q_all, angles_true):
+    ipv.clear()
+    angles_predicted_all = np.zeros((*q_all.shape[0:2], 3))
+    for i, q in enumerate(q_all):
+        angles_predicted_all[i, :] = R.from_quat(q).as_euler("zyz")% (2*np.pi)
+
+    # PREDICTED ANGLES ITERATION    
+    xyz = np.zeros(angles_predicted_all.shape)
+    for i, a in enumerate(angles_predicted_all):
+        z0, y1, z1 = a[:,0], a[:,1], a[:,2]
+        x = z1*np.sin(y1)*np.cos(z0)
+        y = z1*np.sin(y1)*np.sin(z0)
+        z = z1*np.cos(y1)
+        xyz[i,:,:] = np.array([x, y, z]).T
+        
+    # TRUE ANGLES
+    xyz_true = np.zeros(angles_true.shape)
+    z0, y1, z1 = angles_true[:,0], angles_true[:,1], angles_true[:,2]
+
+    x = z1*np.sin(y1)*np.cos(z0)
+    y = z1*np.sin(y1)*np.sin(z0)
+    z = z1*np.cos(y1)
+
+    xyz_true = np.array([x, y, z]).T
+
+    ipv.figure()
+    s = ipv.scatter(xyz[:, :,0], xyz[:, :,1], xyz[:, :,2], marker="sphere", color="blue", size=1)
+    ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=1)
+    ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
+    ipv.animation_control(s, interval=1)
+    ipv.show()
+
+def plot_iterations_rotvec(q_all, angles_true):
+    ipv.clear()
+    angles_predicted_all = np.zeros((*q_all.shape[0:2], 3))
+    for i, q in enumerate(q_all):
+        angles_predicted_all[i, :] = R.from_quat(q).as_euler("zyz")% (2*np.pi)
+
+    arr2 = R.from_euler('zyz', angles_true).as_rotvec()
+    arr3 = np.zeros((len(angles_predicted_all), *arr2.shape))
+    for i, a in enumerate(angles_predicted_all):
+        arr3[i,:] = R.from_euler('zyz', a).as_rotvec()
+
+    ipv.figure()
+    s = ipv.scatter(arr3[:, :,0], arr3[:, :,1], arr3[:, :,2], marker="sphere", color="blue", size=1)
+    ipv.scatter(arr2[:,0], arr2[:,1], arr2[:,2], marker="sphere", color="red", size=1)
+    ipv.animation_control(s, interval=1)
+    ipv.show()
+
+def plot_rotvec(angles_true):
+    a = R.from_euler('zyz', angles_true).as_rotvec()
+
+    ipv.figure()
+    ipv.scatter(a[:,0], a[:,1], a[:,2], marker="sphere", color="red", size=1)
+    ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi, np.pi);ipv.zlim(-np.pi, np.pi);
+    ipv.show()
+
+def plot_polar_plot(angles_true):
+    z0, y1, z1 = angles_true[:,0], angles_true[:,1], angles_true[:,2]
+
+    ipv.figure()
+    x = z1*np.sin(y1)*np.cos(z0)
+    y = z1*np.sin(y1)*np.sin(z0)
+    z = z1*np.cos(y1)
+
+    ipv.scatter(x, y, z, marker="sphere", color="red", size=1)
+    ipv.show()
 
 # def plot_SO3_space(angles, rotation_axes="zyz", normalized=False):
 #     """ zyz - intrinsic rotation ()
@@ -435,7 +502,6 @@ def plot_distances_count(angles_predicted, angles_true):
 
 def plot_dP_dQ(dP_values, dQ_values):
     plt.clf()
-
     # Creating the dataframe for SNS plot
     data = {"d_Q" : dQ_values, #tr_y.numpy(),
             "d_P" : dP_values } #y_tr_pred.T[0]}
@@ -454,9 +520,7 @@ def plot_dP_dQ(dP_values, dQ_values):
     sns.regplot(x=x, y=x, color="k", ax=ax)
     plt.show();
 
-def plot_dP_dQ_density(dP_values, dQ_values):
     plt.clf()
-
     # Creating the dataframe for SNS plot
     data = {"d_Q" : dQ_values, #tr_y.numpy(),
             "d_P" : dP_values } #y_tr_pred.T[0]}
@@ -471,3 +535,11 @@ def plot_dP_dQ_density(dP_values, dQ_values):
     #sns.scatterplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", ax=ax[0]);  # "reg", "kde"
     sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde");  # "reg", "kde"
     plt.show();
+
+    # variance
+    variance = np.sqrt(1/(len(dQ_values)-1)*np.sum(np.power(dP_values-dQ_values, 2)))
+    print(f"Variance = {variance}")
+
+    ar_loss = lambda dQ_values, dP_values: tf.reduce_mean(tf.pow((dQ_values - dP_values), 2))
+    loss = ar_loss(dQ_values, dP_values).numpy()
+    print(f"Min. angle recovery loss possible = {loss}")

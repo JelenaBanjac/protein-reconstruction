@@ -12,8 +12,11 @@ from scipy.spatial.transform import Rotation as R
 
 
 def angles_transpose(angles):
-    angles[:,[0, 2]] = angles[:,[2, 0]]
-    angles *= -1
+    angles = angles.copy()
+    cols = [2, 1, 0]
+    idx = np.empty_like(cols)
+    idx[cols] = np.arange(len(cols))
+    angles[:] = -angles[:, idx]
     return angles
 
 
@@ -86,7 +89,7 @@ def train_angle_recovery(steps,
                     # NT - Distance count subplot (full)
                     d2 = d_q(R.from_euler('zyz', angles_true).as_quat(), q_predicted)
                     axs[1].set_xlim(0, np.pi)
-                    axs[1].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
+                    axs[1].set_title(f"[{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
                     s = sns.distplot(d2, kde=False, bins=100, ax=axs[1], axlabel="Distance [rad]", color="r")
                     max_count = int(max([h.get_height() for h in s.patches]))
                     axs[1].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
@@ -95,7 +98,7 @@ def train_angle_recovery(steps,
                     angles_true_T = angles_transpose(angles_true)
                     d2 = d_q(R.from_euler('zyz', angles_true_T).as_quat(), q_predicted)
                     axs[2].set_xlim(0, np.pi)
-                    axs[2].set_title(f"FULL: [{step}/{steps}] TRANSPOSED Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
+                    axs[2].set_title(f"[{step}/{steps}] TRANSPOSED Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} rad ({np.degrees(np.mean(d2)):.2e}) STD={np.std(d2):.2e}")
                     s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
                     max_count = int(max([h.get_height() for h in s.patches]))
                     axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
@@ -106,7 +109,7 @@ def train_angle_recovery(steps,
                     axs.plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
                     axs.set_xlabel('time [s]')
                     axs.set_ylabel('loss');
-                    axs.set_title(f"[{step}/{steps}] Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
+                    axs.set_title(f"[{step}/{steps}] Angle recovery optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
 
                     
                 IPyDisplay.clear_output(wait=True)

@@ -1,4 +1,4 @@
-from cryoem.conversions import euler2quaternion, d_q, quaternion2euler
+
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
 from tensorflow_graphics.geometry.transformation import quaternion
@@ -9,10 +9,10 @@ import seaborn as sns; sns.set(style="white", color_codes=True)
 import random
 from tensorflow_graphics.math import vector
 from itertools import product
-from cryoem.rotation_matrices import euler2matrix, d_r
 import time
 from IPython import display as IPyDisplay
 from scipy.spatial.transform import Rotation as R
+from cryoem.conversions import euler2quaternion, d_q
 
 
 def euler6tomarix4d(a_R):
@@ -105,93 +105,93 @@ def gradient_alignment(m, a_R, q_predicted, q_true):
 
 def training_angle_alignment(m, steps, batch_size, learning_rate, angles_true, angles_predicted):
     
-    with tf.device('/device:GPU:0'):
-        arr = []
-        
-        optimizer = Adam(learning_rate=learning_rate)
-        
-        time_start = time.time()
+    collect_data = []
 
-        report = ""
+    optimizer = Adam(learning_rate=learning_rate)
 
-        losses = np.empty(steps)
-        angles_predicted = tf.convert_to_tensor(angles_predicted)
+    time_start = time.time()
 
-        euler = tf.random.uniform([6], 0, 2*np.pi, dtype=tf.float64) #np.zeros(6, dtype=np.float64)
-        a_R = [tf.Variable(euler)]
-        
-        q_predicted = euler2quaternion(angles_predicted)
-        q_true = euler2quaternion(angles_true)
+    report = ""
 
-        for step in range(1, steps+1):
+    losses = np.empty(steps)
+    angles_predicted = tf.convert_to_tensor(angles_predicted)
 
-            # Sample some pairs.
-            idx = list(np.random.choice(range(len(angles_predicted)), size=batch_size))
+    euler = tf.random.uniform([6], 0, 2*np.pi, dtype=tf.float64) #np.zeros(6, dtype=np.float64)
+    a_R = [tf.Variable(euler)]
 
-            # Compute distances between projections
-            qt = [q_true[i]      for i in idx]
-            qp = [q_predicted[i] for i in idx]
+    q_predicted = euler2quaternion(angles_predicted)
+    q_true = euler2quaternion(angles_true)
 
-            # Optimize by gradient descent.
-            losses[step-1], gradients = gradient_alignment(m, a_R, qp, qt)
-            optimizer.apply_gradients(zip(gradients, a_R))
-            
-            update_lr = 300
-            if step>update_lr and step%update_lr==0 and losses[step-1]-losses[step-1-update_lr+100] < 0.1:
-                learning_rate *= 0.1
+    for step in range(1, steps+1):
 
-            # Visualize progress periodically
-            if step % 10 == 0:
-                qu = update_quaternion(m, a_R, q_predicted)
-                
-                arr.append(R.from_quat(update_quaternion(m, a_R, q_predicted)).as_rotvec())
-                
-                plt.close();
-                sns.set(style="white", color_codes=True)
-                sns.set(style="whitegrid")
+        # Sample some pairs.
+        idx = list(np.random.choice(range(len(angles_predicted)), size=batch_size))
 
-                fig, axs = plt.subplots(1, 3, figsize=(24,7))
-                
-                # Distance count subplot (batches)
-                qpr = update_quaternion(m, a_R, qp)
-                d1 = d_q(qpr, qt)
-                axs[0].set_xlim(0, np.pi)
-                #axs[0].set_ylim(0, batch_size)
-                axs[0].set_title(f"BATCHES (size={len(qp)}): [{step}/{steps}] Distances between true and predicted angles \nMEAN={np.mean(d1):.2e} STD={np.std(d1):.2e}")
-                s = sns.distplot(d1, kde=False, bins=100, ax=axs[0], axlabel="Distance [rad]", color="r")
-                max_count = int(max([h.get_height() for h in s.patches]))
-                axs[0].plot([np.mean(d1)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+        # Compute distances between projections
+        qt = [q_true[i]      for i in idx]
+        qp = [q_predicted[i] for i in idx]
 
-                # Optimization loss subplot
-                axs[1].plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
-                axs[1].set_xlabel('time [s]')
-                axs[1].set_ylabel('loss');
-                axs[1].set_title(f"Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
-                
-                # Distance count subplot (full)
-                q_predicted_rot = update_quaternion(m, a_R, q_predicted)
-                d2 = d_q(q_predicted_rot, q_true)
-                axs[2].set_xlim(0, np.pi)
-                # axs[2].set_ylim(0, len(angles_true))
-                axs[2].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} ({np.degrees(np.mean(d2)):.2e} deg) STD={np.std(d2):.2e}\nMEDIAN={np.median(d2):.2e} ({np.degrees(np.median(d2)):.2e} deg)")
-                s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
-                max_count = int(max([h.get_height() for h in s.patches]))
-                axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+        # Optimize by gradient descent.
+        losses[step-1], gradients = gradient_alignment(m, a_R, qp, qt)
+        optimizer.apply_gradients(zip(gradients, a_R))
 
-                
-                IPyDisplay.clear_output(wait=True)
-                IPyDisplay.display(plt.gcf())
-                plt.close();
-                time.sleep(1.0)
-        
+        update_lr = 300
+        if step>update_lr and step%update_lr==0 and losses[step-1]-losses[step-1-update_lr+100] < 0.1:
+            learning_rate *= 0.1
 
-            # Periodically report progress.
-            if ((step % (steps//10)) == 0) or (step == steps):
-                time_elapsed = time.time() - time_start
-                report += f'step {step}/{steps} ({time_elapsed:.0f}s): loss = {np.mean(losses[step-steps//10:step-1]):.2e}\n'
+        # Visualize progress periodically
+        if step % 10 == 0:
+            qu = update_quaternion(m, a_R, q_predicted)
 
-            if step >= 101 and np.mean(losses[step-101:step-1]) < 1e-3:
-                break;
+            collect_data.append(qu.numpy())
 
-        print(report)
-        return m, a_R, losses, np.array(arr)
+            plt.close();
+            sns.set(style="white", color_codes=True)
+            sns.set(style="whitegrid")
+
+            fig, axs = plt.subplots(1, 3, figsize=(24,7))
+
+            # Distance count subplot (batches)
+            qpr = update_quaternion(m, a_R, qp)
+            d1 = d_q(qpr, qt)
+            axs[0].set_xlim(0, np.pi)
+            #axs[0].set_ylim(0, batch_size)
+            axs[0].set_title(f"BATCHES (size={len(qp)}): [{step}/{steps}] Distances between true and predicted angles \nMEAN={np.mean(d1):.2e} STD={np.std(d1):.2e}")
+            s = sns.distplot(d1, kde=False, bins=100, ax=axs[0], axlabel="Distance [rad]", color="r")
+            max_count = int(max([h.get_height() for h in s.patches]))
+            axs[0].plot([np.mean(d1)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+
+            # Optimization loss subplot
+            axs[1].plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
+            axs[1].set_xlabel('time [s]')
+            axs[1].set_ylabel('loss');
+            axs[1].set_title(f"Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
+
+            # Distance count subplot (full)
+            q_predicted_rot = update_quaternion(m, a_R, q_predicted)
+            d2 = d_q(q_predicted_rot, q_true)
+            axs[2].set_xlim(0, np.pi)
+            # axs[2].set_ylim(0, len(angles_true))
+            axs[2].set_title(f"FULL: [{step}/{steps}] Distances between true and predicted angles\nMEAN={np.mean(d2):.2e} ({np.degrees(np.mean(d2)):.2e} deg) STD={np.std(d2):.2e}\nMEDIAN={np.median(d2):.2e} ({np.degrees(np.median(d2)):.2e} deg)")
+            s = sns.distplot(d2, kde=False, bins=100, ax=axs[2], axlabel="Distance [rad]", color="r")
+            max_count = int(max([h.get_height() for h in s.patches]))
+            axs[2].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+
+
+            IPyDisplay.clear_output(wait=True)
+            IPyDisplay.display(plt.gcf())
+            plt.close();
+            time.sleep(.1)
+
+
+        # Periodically report progress.
+        if ((step % (steps//10)) == 0) or (step == steps):
+            time_elapsed = time.time() - time_start
+            report += f'step {step}/{steps} ({time_elapsed:.0f}s): loss = {np.mean(losses[step-steps//10:step-1]):.2e}\n'
+
+        if step >= 101 and np.mean(losses[step-101:step-1]) < 1e-3:
+            break;
+
+    print(report)
+    print("---")
+    return m, a_R, losses, np.array(collect_data)
