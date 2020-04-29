@@ -65,9 +65,9 @@ def train_angle_recovery(steps,
             
             # Visualize progress periodically
             if step % 10 == 0:
-                a = np.zeros((len(q_predicted), 3))
+                a = np.zeros((len(q_predicted), 4))
                 for i, e in enumerate(q_predicted):
-                    a[i] = R.from_quat(e.numpy()).as_rotvec()
+                    a[i] = e.numpy()
                 collect_data.append(a)
                 
                 plt.close();
