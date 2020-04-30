@@ -129,7 +129,7 @@ def plot_only_closest_in_euclidean_space(angles, closest):
     ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
     ipv.show()
  
-def plot_iterations_polar_plot(q_all, angles_true):
+def plot_iterations_polar_plot(q_all, angles_true, interval=1):
     ipv.clear()
     angles_predicted_all = np.zeros((*q_all.shape[0:2], 3))
     for i, q in enumerate(q_all):
@@ -158,10 +158,10 @@ def plot_iterations_polar_plot(q_all, angles_true):
     s = ipv.scatter(xyz[:, :,0], xyz[:, :,1], xyz[:, :,2], marker="sphere", color="blue", size=1)
     ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=1)
     ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
-    ipv.animation_control(s, interval=1)
+    ipv.animation_control(s, interval=interval)
     ipv.show()
 
-def plot_iterations_rotvec(q_all, angles_true):
+def plot_iterations_rotvec(q_all, angles_true, interval=1):
     ipv.clear()
     angles_predicted_all = np.zeros((*q_all.shape[0:2], 3))
     for i, q in enumerate(q_all):
@@ -175,7 +175,7 @@ def plot_iterations_rotvec(q_all, angles_true):
     ipv.figure()
     s = ipv.scatter(arr3[:, :,0], arr3[:, :,1], arr3[:, :,2], marker="sphere", color="blue", size=1)
     ipv.scatter(arr2[:,0], arr2[:,1], arr2[:,2], marker="sphere", color="red", size=1)
-    ipv.animation_control(s, interval=1)
+    ipv.animation_control(s, interval=interval)
     ipv.show()
 
 def plot_rotvec(angles_true):
