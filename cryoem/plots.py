@@ -98,15 +98,15 @@ def plot_one_closest_vs_all_in_euclidean_space(angles, closest):
 
 def plot_only_selected_in_euclidean_space(angles, angles_true, selected):
     ipv.clear()
-    aps = RotationMatrix(np.take(angles, selected, axis=0))
-    ats = RotationMatrix(np.take(angles_true, selected, axis=0))
+    aps = RotationMatrix(np.take(angles, selected, axis=0))[:,:3]
+    ats = RotationMatrix(np.take(angles_true, selected, axis=0))[:,:3]
+    connections = np.empty((len(selected)*2, 2,3))
+    connections[:] = np.nan
+    connections[::2] = np.stack([ats, aps],axis=1)
+    
     ipv.scatter(ats[:,0], ats[:,1], ats[:,2], marker="sphere", color="green", size=1)
     ipv.scatter(aps[:,0], aps[:,1], aps[:,2], marker="sphere", color="red", size=1)
-    for i in selected:
-        connection0 = [ats[i,0], aps[i,0]]
-        connection1 = [ats[i,1], aps[i,1]]
-        connection2 = [ats[i,2], aps[i,2]]
-        ipv.plot(connection0, connection1, connection2,color="red", lynestyle="--")
+    ipv.plot(connections[:,:,0].flatten(),connections[:,:,1].flatten(), connections[:,:,2].flatten(),color="red", lynestyle="--")
     ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
     ipv.show()
  
@@ -129,7 +129,13 @@ def plot_only_closest_in_euclidean_space(angles, closest):
     ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
     ipv.show()
  
-def plot_iterations_polar_plot(q_all, angles_true, interval=1):
+def plot_iterations_polar_plot(q_all, angles_true, interval=1, selected=None):
+    if q_all.shape[1] != angles_true.shape[0]:
+        raise Exception("Should specify the same number of true angles and predicted angles")
+    
+    if not selected:
+        selected = range(len(angles_true))
+        
     ipv.clear()
     angles_predicted_all = np.zeros((*q_all.shape[0:2], 3))
     for i, q in enumerate(q_all):
@@ -153,12 +159,33 @@ def plot_iterations_polar_plot(q_all, angles_true, interval=1):
     z = z1*np.cos(y1)
 
     xyz_true = np.array([x, y, z]).T
-
+    
+    xyz_true = np.take(xyz_true, selected, axis=0)
+    xyz = np.take(xyz, selected, axis=1)
+    xyzt = np.stack((xyz_true,)*len(xyz), axis=0)
+    
+    N = len(selected)
+    steps = len(xyz)
+    x = np.zeros((steps, 2*N))
+    y = np.zeros((steps, 2*N))
+    z = np.zeros((steps, 2*N))
+    
+    x[0] = np.concatenate([xyz_true[:,0], xyz[0,:,0]])
+    y[0] = np.concatenate([xyz_true[:,1], xyz[0,:,1]])
+    z[0] = np.concatenate([xyz_true[:,2], xyz[0,:,2]])
+    for i in range(1, steps):
+        x[i] = np.concatenate([xyz_true[:,0], xyz[i,:,0]])
+        y[i] = np.concatenate([xyz_true[:,1], xyz[i,:,1]])
+        z[i] = np.concatenate([xyz_true[:,2], xyz[i,:,2]])
+    
     ipv.figure()
-    s = ipv.scatter(xyz[:, :,0], xyz[:, :,1], xyz[:, :,2], marker="sphere", color="blue", size=1)
-    ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=1)
+    lines = [[i, i+N] for i in range(len(selected))]
+    s = ipv.scatter(x, y, z, color="blue", marker="sphere")
+    d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+    p = ipv.plot_trisurf(x, y, z, lines=lines);
+    ipv.animation_control([d,s, p], interval=interval)
+
     ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
-    ipv.animation_control(s, interval=interval)
     ipv.show()
 
 def plot_iterations_rotvec(q_all, angles_true, interval=1):
