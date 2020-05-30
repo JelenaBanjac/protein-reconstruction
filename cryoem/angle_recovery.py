@@ -24,7 +24,7 @@ def train_angle_recovery(steps,
                          batch_size, 
                          in_data, 
                          distance_fn, 
-                         angles_predicted=None,
+                         q_predicted=None,
                          angles_true=None,
                          learning_rate=0.01, 
                          optimization=False): 
@@ -38,9 +38,13 @@ def train_angle_recovery(steps,
     euler = np.random.uniform(low=[low_ang[0], low_ang[1], low_ang[2]], 
                           high=[high_ang[0], high_ang[1], high_ang[2]],
                           size=(len(in_data), 3))
-    q_predicted = [tf.Variable(q) for q in euler2quaternion(euler)]
-#     q_predicted = [tf.Variable(tf.cast(quaternion.normalized_random_uniform((1,)), dtype=tf.float64)) for _ in range(len(in_data))]
-    
+    if q_predicted:
+        # continue where left off
+        q_predicted = [tf.Variable(q) for q in q_predicted]
+    else:
+        # optimize from scratch
+        q_predicted = [tf.Variable(q) for q in euler2quaternion(euler)]
+
     if in_data.shape[1] == 3:
         in_data = euler2quaternion(in_data)
     
