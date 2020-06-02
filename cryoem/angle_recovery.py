@@ -24,6 +24,7 @@ def train_angle_recovery(steps,
                          batch_size, 
                          in_data, 
                          distance_fn, 
+                         file_name,
                          q_predicted=None,
                          angles_true=None,
                          learning_rate=0.01, 
@@ -120,6 +121,8 @@ def train_angle_recovery(steps,
                 IPyDisplay.display(plt.gcf())
                 plt.close();
                 time.sleep(0.1)
+
+                np.savez(file_name, quaternion.normalize(q_predicted), losses, np.array(collect_data))
                 
                 if found_minimizer:
                     time_elapsed = time.time() - time_start

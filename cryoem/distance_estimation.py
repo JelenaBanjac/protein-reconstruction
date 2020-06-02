@@ -23,7 +23,49 @@ from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.utils import plot_model
 
+def global_standardization(X):
+    """Does not have all the positive piels
+    Ref: https://machinelearningmastery.com/how-to-manually-scale-image-pixel-data-for-deep-learning/""" 
+    print(f'Image shape: {X[0].shape}')
+    print(f'Data Type: {X[0].dtype}')
+    X = X.astype('float32')
 
+    print("***")
+    ## GLOBAL STANDARDIZATION
+    # calculate global mean and standard deviation
+    mean, std = X.mean(), X.std()
+    print(f'Mean: {mean:.3f} | Std: {std:.3f}')
+    print(f'Min:  {X.min():.3f} | Max: {X.max():.3f}')
+    # global standardization of pixels
+    X = (X - mean) / std
+    # confirm it had the desired effect
+    mean, std = X.mean(), X.std()
+    print(f'Mean: {mean:.3f} | Std: {std:.3f}')
+    print(f'Min:  {X.min():.3f} | Max: {X.max():.3f}')
+    
+    return X
+
+def positive_global_standardization(X):
+    """Has all positive pixels
+    Ref: https://machinelearningmastery.com/how-to-manually-scale-image-pixel-data-for-deep-learning/"""
+    mean, std = X.mean(), X.std()
+    print(f"Mean: {mean:.3f} | Std: {std:.3f}")
+
+    # global standardization of pixels
+    X = (X - mean) / std
+
+    # clip pixel values to [-1,1]
+    X = np.clip(X, -1.0, 1.0)
+
+    # shift from [-1,1] to [0,1] with 0.5 mean
+    X = (X + 1.0) / 2.0
+
+    # confirm it had the desired effect
+    mean, std = X.mean(), X.std()
+    print(f'Mean: {mean:.3f} | Std: {std:.3f}')
+    print(f'Min:  {X.min():.3f} | Max: {X.max():.3f}')
+    
+    return X
 
 def sample_pairs(projections, num_pairs, style="random", k=None):
     if not k and style != "random":
