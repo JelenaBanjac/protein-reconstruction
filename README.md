@@ -88,7 +88,7 @@ python generator.py -conf protein.config --input-file data/5j0n.mrc -num 5000 -s
 ## Misc information
 
 ### Package versions
-The following versions of the packages are installed with Astra-toolbox installation.
+The following versions of the packages are used in the project.
 ```
 python-3.6.8
 cudnn-7.1.3
@@ -103,58 +103,21 @@ nvidia driver 415
 
 ```
 $ nvcc --version
-
 $ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 ```
 
-# Notebooks
+## Logbook
+Notes taken during the project development:
+- [Experiments notes](https://app.box.com/s/8heyh18d473xetiqzu1eorkzk29ax40e)
+- [Meeting notes](https://app.box.com/s/0x42ke3j5e6yyoomlhukcayf4qz3ezgw)
+- [Summary notes of work left to be done after first 4 months](https://app.box.com/s/ndgnxrgompchlhr7o2hoqaalacjp98hd)
 
-Data generation:
-- [5j0n_generate_data_5000_0.5sphere.ipynb](notebooks/5j0n_generate_data_5000_0.5sphere.ipynb)
-- [GeneratingData.ipynb](notebooks/GeneratingData.ipynb)
-- [Graph-50000HalfAngCoverage.ipynb](notebooks/Graph-50000HalfAngCoverage.ipynb)
-- [Graph-5000FullAngCoverage.ipynb](notebooks/Graph-5000FullAngCoverage.ipynb)
-- [Graph-5000HalfAngCoverage.ipynb](notebooks/Graph-5000HalfAngCoverage.ipynb)
-- [Graph-5000HalfAngCoverage-WithGaussNoise15.ipynb](notebooks/Graph-5000HalfAngCoverage-WithGaussNoise15.ipynb)
-- [Graph-5000HalfAngCoverage-WithGaussNoise2.ipynb](notebooks/Graph-5000HalfAngCoverage-WithGaussNoise2.ipynb)
-
-Different angle coverage visualizations:
-- [angle_variety.ipynb](notebooks/angle_variety.ipynb)
-
-Euclidean distance estimation and angle recovery on BGAL protein (symmetric):
-- [bgal_optimization_predicted_angle_and_true_angle.ipynb](notebooks/bgal_optimization_predicted_angle_and_true_angle.ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(knn_and_slope).ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(knn_and_slope).ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(knn_and_slope)-LR0.001.ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(knn_and_slope)-LR0.001.ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(knn&random_and_slope)-Copy1.ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(knn&random_and_slope)-Copy1.ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(knn&random_and_slope).ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(knn&random_and_slope).ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(random_and_polyfit)-CONSTRAINED-TODO.ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(random_and_polyfit)-CONSTRAINED-TODO.ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(random_and_polyfit).ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(random_and_polyfit).ipynb)
-- [bgal_optimization_predicted_angle_and_true_projection_(random_and_slope).ipynb](notebooks/bgal_optimization_predicted_angle_and_true_projection_(random_and_slope).ipynb)
-- [optimization_predicted_angle_and_true_projection.ipynb](notebooks/optimization_predicted_angle_and_true_projection.ipynb)
-
-Euclidean distance estimation and angle recovery on 5J0N protein (asymmetric):
-- [5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-corrected-%.ipynb](notebooks/5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-corrected-%.ipynb)
-- [5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-corrected.ipynb](notebooks/5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-corrected.ipynb)
-- [5j0n_optimization_predicted_angle_and_true_projection_0.5angcov.ipynb](notebooks/5j0n_optimization_predicted_angle_and_true_projection_0.5angcov.ipynb)
-- [5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM-corrected-%.ipynb](notebooks/5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM-corrected-%.ipynb)
-- [5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM-corrected.ipynb](notebooks/5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM-corrected.ipynb)
-- [5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM.ipynb](notebooks/5j0n_optimization_predicted_angle_and_true_projection_0.5angcov-RANDOM.ipynb)
-
-Initial notebooks:
-- [angle_optimization.ipynb](notebooks/angle_optimization.ipynb)
-- [angle_optimization_with_GT-notworking.ipynb](notebooks/angle_optimization_with_GT-notworking.ipynb)
-
-Manifold learning (on 5j0n):
-- [MDS](notebooks/5j0n_manifold_learning_MDS.ipynb)
-- [Spectral Embedding](notebooks/5j0n_manifold_learning_SpectralEmbedding.ipynb)
-
-K-NN Adjacency matrices:
-- [projections and angles](notebooks/knn_adjacency_matrices.ipynb)
-
-Siamese NN (on 5j0n):
-- [random sampling](notebooks/Siamese_KERAS-protein-random.ipynb)
-- [knn projections and random sampling](notebooks/Siamese_KERAS-protein-knn-and-random.ipynb)
-- toberemoved 1K epochs [knn projections and random sampling](notebooks/Siamese_KERAS-protein-epochs1000.ipynb)
+## Notebooks
+Notebooks are divided in several phases of development:
+- [Phase 0](notebooks/0-preparation): preparation of the simulated data, generating 3D protein's set of 2D projection images and their corresponding angles
+- [Phase 1](notebooks/1-phase1): angle recovery using the perfect distances
+- [Phase 2](notebooks/2-phase2): distance estimation and angle recovery
+- [Phase 3](notebooks/3-phase3): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2) 
 
 ## Team
 **Student:**  
