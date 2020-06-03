@@ -122,7 +122,7 @@ def train_angle_recovery(steps,
                 plt.close();
                 time.sleep(0.1)
 
-                np.savez(file_name, quaternion.normalize(q_predicted), losses, np.array(collect_data))
+                np.savez(file_name, quaternion.normalize(q_predicted).numpy(), losses, np.array(collect_data))
                 
                 if found_minimizer:
                     time_elapsed = time.time() - time_start
@@ -143,7 +143,7 @@ def train_angle_recovery(steps,
             found_minimizer = True
             
     print(report)
-    return quaternion.normalize(q_predicted), losses, np.array(collect_data)
+    return quaternion.normalize(q_predicted).numpy(), losses, np.array(collect_data)
         
 def sample_iter(steps, projection_idx, num_pairs, style="random", k=None):
 
