@@ -19,14 +19,23 @@ This repository contains scripts to generate a huge amount of 2D projections wit
 Also, it contains the notebooks with different combinations of project approaches.
 
 ## Installation
-Create the conda environment in which the project will be ran.
+First, download and install Anaconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
+
+Then open the terminal and type following:
 ```
+# clone the repo
+$ git clone https://github.com/JelenaBanjac/protein-reconstruction.git
+
+# position yourself inside the project
+$ cd protein-reconstruction
+
 # create environment
 $ conda env create -f environment.yml
 
 # activate environment
 $ conda activate protein_reconstruction
 ```
+Now you are able to use the code and run the notebooks you wish!
 
 [Optional] Test if some dependencies are installed:
 ```
