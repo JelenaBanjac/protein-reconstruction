@@ -107,7 +107,6 @@ cudatoolkit-8.0
 cuda 10
 cuDNN 7
 nvidia driver 415
-
 ```
 
 ```
@@ -126,7 +125,7 @@ Notebooks are divided in several phases of development:
 - [Phase 0](notebooks/0-preparation): preparation of the simulated data, generating 3D protein's set of 2D projection images and their corresponding angles
 - [Phase 1](notebooks/1-phase1): angle recovery using the perfect distances
 - [Phase 2](notebooks/2-phase2): distance estimation and angle recovery
-- [Phase 3](notebooks/3-phase3): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2) 
+- [Phase 3](notebooks/3-reconstruction): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2) 
 
 ### Colab Notebooks
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/distance_estimation_and_angle_recovery-test5j0nhalf-cov-polynomialAR.ipynb) Distance Estimation with Angle Recovery Polynomial
