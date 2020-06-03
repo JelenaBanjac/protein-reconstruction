@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import train_test_split
 import pathlib
-
-from cryoem.projections import RotationMatrix
+from cryoem.rotation_matrices import RotationMatrix
 from cryoem.conversions import euler2quaternion, d_q
 from cryoem.knn import get_knn_projections
 

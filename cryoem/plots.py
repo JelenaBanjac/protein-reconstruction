@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import ipyvolume as ipv
-from cryoem.projections import RotationMatrix
+from cryoem.rotation_matrices import RotationMatrix
 from scipy.spatial.transform import Rotation as R
 import numpy as np
 import tensorflow as tf
