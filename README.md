@@ -128,7 +128,8 @@ Notebooks are divided in several phases of development:
 - [Phase 3](notebooks/3-reconstruction): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2) 
 
 ### Colab Notebooks
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/distance_estimation_and_angle_recovery-test5j0nhalf-cov-polynomialAR.ipynb) Distance Estimation with Angle Recovery Polynomial
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov-polynomialAR.ipynb) Polynomial Angle Recovery with Already Estimated Distances
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov_noisy.ipynb) Distance Estimation with Noisy Dataset
 
 ## Team
 **Student:**  
