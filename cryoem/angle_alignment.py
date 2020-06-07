@@ -103,11 +103,11 @@ def gradient_alignment(m, a_R, q_predicted, q_true):
     return loss_value, gradient
 
 
-def training_angle_alignment(m, steps, batch_size, learning_rate, angles_true, angles_predicted):
+def training_angle_alignment(m, steps, batch_size, optimizer, learning_rate, angles_true, angles_predicted):
     
     collect_data = []
 
-    optimizer = Adam(learning_rate=learning_rate)
+    optimizer = optimizer(learning_rate=learning_rate)
 
     time_start = time.time()
 

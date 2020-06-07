@@ -8,7 +8,7 @@ import astra
 
 def reconstruct(projections, angles, mrc_filename=True, transposed=False):
     # Generate orientation vectors based on angles
-    orientation_vectors   = RotationMatrix(angles, transposed)
+    orientation_vectors   = RotationMatrix(angles)
 
     # Reshape projections correctly 
     projections1 = np.transpose(projections, (1, 0, 2))

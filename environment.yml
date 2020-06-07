@@ -102,7 +102,7 @@ dependencies:
   - pexpect=4.7.0=py36_0
   - pickleshare=0.7.5=py36_0
   - pillow=6.2.1=py36h34e0f95_0
-  - pip=19.3.1=py36_0
+  - pip=20.0.2=py36_3
   - prometheus_client=0.7.1=py_0
   - prompt_toolkit=2.0.10=py_0
   - pthread-stubs=0.4=h14c3975_1001
