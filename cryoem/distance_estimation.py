@@ -10,7 +10,7 @@ import pathlib
 from cryoem.rotation_matrices import RotationMatrix
 from cryoem.conversions import euler2quaternion, d_q
 from cryoem.knn import get_knn_projections
-
+from skimage.transform import rescale
 import random
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
@@ -65,6 +65,21 @@ def positive_global_standardization(X):
     print(f'Min:  {X.min():.3f} | Max: {X.max():.3f}')
     
     return X
+
+def rescale_images(original_images):
+    mobile_net_possible_dims = [128, 160, 192, 224]
+    dim_goal = 128
+    
+    for dim in mobile_net_possible_dims:
+        if original_images.shape[1] <= dim:
+            dim_goal = dim
+            break;
+    print(f"Image rescaled from dimension {original_images.shape[1]} to {dim_goal} for MobileNet")
+    scale = dim_goal/original_images.shape[1]
+    images = np.empty((original_images.shape[0], dim_goal, dim_goal))
+    for i, original_image in enumerate(original_images):
+        images[i] = rescale(original_image, (scale, scale), multichannel=False)
+    return images
 
 def sample_pairs(projections, num_pairs, style="random", k=None):
     if not k and style != "random":
