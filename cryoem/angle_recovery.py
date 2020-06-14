@@ -89,7 +89,7 @@ def train_angle_recovery(steps,
                     axs[0].plot(np.linspace(0, time.time()-time_start, step), losses[:step], marker="o", lw=1, markersize=3)
                     axs[0].set_xlabel('time [s]')
                     axs[0].set_ylabel('loss');
-                    axs[0].set_title(f"[{step}/{steps}] Angle alignment optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
+                    axs[0].set_title(f"[{step}/{steps}] Angle recovery optimization \nLOSS={np.mean(losses[step-10:step]):.2e} LR={learning_rate:.2e}")
 
                     # NT - Distance count subplot (full)
                     d2 = d_q(R.from_euler('zyz', angles_true).as_quat(), q_predicted)
