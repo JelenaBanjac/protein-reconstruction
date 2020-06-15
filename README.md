@@ -130,7 +130,7 @@ Notebooks are divided in several phases of development:
 ### Colab Notebooks
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov-polynomialAR.ipynb) Polynomial Angle Recovery with Already Estimated Distances
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov_noisy.ipynb) Distance Estimation with Noisy Dataset
-
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov_cosine.ipynb) Distance Estimation with Cosine Distance
 ## Team
 **Student:**  
 [Jelena Banjac](https://jelenabanjac.com), jelena.banjac@epfl.ch, Data Science Master Student
