@@ -122,7 +122,7 @@ Notes taken during the project development:
 
 ## Notebooks
 Notebooks are divided in several phases of development:
-- [Phase 0](notebooks/0-preparation): preparation of the simulated data, generating 3D protein's set of 2D projection images and their corresponding angles
+- [Phase 0](notebooks/0-preparation): prepare simulated data, generate 3D protein's set of 2D projection images and their corresponding angles
 - [Phase 1](notebooks/1-phase1): angle recovery using the perfect distances
 - [Phase 2](notebooks/2-phase2): distance estimation and angle recovery
 - [Phase 3](notebooks/3-reconstruction): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2) 
