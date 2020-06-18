@@ -129,7 +129,7 @@ def plot_only_closest_in_euclidean_space(angles, closest):
     ipv.xlim(-1, 1);ipv.ylim(-1,1);ipv.zlim(-1, 1)
     ipv.show()
  
-def plot_iterations_polar_plot(q_all, angles_true, interval=1, selected=None):
+def plot_iterations_polar_plot(q_all, angles_true, interval=1, connections=True, selected=None):
     if q_all.shape[1] != angles_true.shape[0]:
         raise Exception("Should specify the same number of true angles and predicted angles")
     
@@ -182,8 +182,11 @@ def plot_iterations_polar_plot(q_all, angles_true, interval=1, selected=None):
     lines = [[i, i+N] for i in range(len(selected))]
     s = ipv.scatter(x, y, z, color="blue", marker="sphere")
     d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
-    p = ipv.plot_trisurf(x, y, z, lines=lines);
-    ipv.animation_control([d,s, p], interval=interval)
+    if connections:
+        p = ipv.plot_trisurf(x, y, z, lines=lines);
+        ipv.animation_control([d,s, p], interval=interval)
+    else:
+        ipv.animation_control([d,s], interval=interval)
 
     ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
     ipv.show()
