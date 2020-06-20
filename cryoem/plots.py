@@ -180,13 +180,16 @@ def plot_iterations_polar_plot(q_all, angles_true, interval=1, connections=True,
     
     ipv.figure()
     lines = [[i, i+N] for i in range(len(selected))]
-    s = ipv.scatter(x, y, z, color="blue", marker="sphere")
-    d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+        
     if connections:
+        s = ipv.scatter(x, y, z, color="blue", marker="sphere")
+        d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
         p = ipv.plot_trisurf(x, y, z, lines=lines);
         ipv.animation_control([d,s, p], interval=interval)
     else:
-        ipv.animation_control([d,s], interval=interval)
+        s = ipv.scatter(x, y, z, color="blue", marker="sphere")
+        ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+        ipv.animation_control(s, interval=interval)
 
     ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
     ipv.show()
