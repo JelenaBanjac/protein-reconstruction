@@ -28,14 +28,18 @@ def train_angle_recovery(steps,
                          limit_distance=np.pi,
                          q_predicted=None,
                          angles_true=None,
+                         low_ang_const=[0.0, 0.0, 0.0],
+                         high_ang_const=[2.0, 0.4, 2.0],
                          learning_rate=0.01): 
 
     time_start = time.time()
     collect_data = []
     optimizer = Adam(learning_rate=learning_rate)
 
-    low_ang = [0.0*np.pi, 0.0*np.pi, 0.0*np.pi]
-    high_ang = [2.0*np.pi, 0.4*np.pi, 2.0*np.pi]            
+    #low_ang = [0.0*np.pi, 0.0*np.pi, 0.0*np.pi]
+    low_ang = list(map(lambda x: x*np.pi, low_ang_const))
+    #high_ang = [2.0*np.pi, 0.4*np.pi, 2.0*np.pi] 
+    high_ang = list(map(lambda x: x*np.pi, high_ang_const))           
     euler = np.random.uniform(low=[low_ang[0], low_ang[1], low_ang[2]], 
                           high=[high_ang[0], high_ang[1], high_ang[2]],
                           size=(len(in_data), 3))
