@@ -194,21 +194,72 @@ def plot_iterations_polar_plot(q_all, angles_true, interval=1, connections=True,
     ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
     ipv.show()
 
-def plot_iterations_rotvec(q_all, angles_true, interval=1):
+def plot_iterations_rotvec(q_all, angles_true, interval=1, connections=True, selected=None, c=1):
+    ipv.clear()
+    if q_all.shape[1] != angles_true.shape[0]:
+        raise Exception("Should specify the same number of true angles and predicted angles")
+
+    if not selected:
+        selected = range(len(angles_true))
+
     ipv.clear()
     angles_predicted_all = np.zeros((*q_all.shape[0:2], 3))
     for i, q in enumerate(q_all):
         angles_predicted_all[i, :] = R.from_quat(q).as_euler("zyz")% (2*np.pi)
 
-    arr2 = R.from_euler('zyz', angles_true).as_rotvec()
-    arr3 = np.zeros((len(angles_predicted_all), *arr2.shape))
+    # PREDICTED ANGLES ITERATION    
+    xyz = np.zeros(angles_predicted_all.shape)
     for i, a in enumerate(angles_predicted_all):
-        arr3[i,:] = R.from_euler('zyz', a).as_rotvec()
+        #z0, y1, z1 = a[:,0], a[:,1], a[:,2]
+        rv = R.from_euler('zyz', a).as_rotvec()
+        x = rv[:,0]
+        y = rv[:,1]
+        z = rv[:,2]
+        xyz[i,:,:] = np.array([x, y, z]).T
+
+    # TRUE ANGLES
+    xyz_true = np.zeros(angles_true.shape)
+    #z0, y1, z1 = angles_true[:,0], angles_true[:,1], angles_true[:,2]
+    rvt = R.from_euler('zyz', angles_true).as_rotvec()
+
+    x = rvt[:,0]
+    y = rvt[:,1]
+    z = rvt[:,2]
+
+    xyz_true = np.array([x, y, z]).T
+
+    xyz_true = np.take(xyz_true, selected, axis=0)
+    xyz = np.take(xyz, selected, axis=1)
+    xyzt = np.stack((xyz_true,)*len(xyz), axis=0)
+
+    N = len(selected)
+    steps = len(xyz)
+    x = np.zeros((steps, 2*N))
+    y = np.zeros((steps, 2*N))
+    z = np.zeros((steps, 2*N))
+
+    x[0] = np.concatenate([xyz_true[:,0], xyz[0,:,0]])
+    y[0] = np.concatenate([xyz_true[:,1], xyz[0,:,1]])
+    z[0] = np.concatenate([xyz_true[:,2], xyz[0,:,2]])
+    for i in range(1, steps):
+        x[i] = np.concatenate([xyz_true[:,0], xyz[i,:,0]])
+        y[i] = np.concatenate([xyz_true[:,1], xyz[i,:,1]])
+        z[i] = np.concatenate([xyz_true[:,2], xyz[i,:,2]])
 
     ipv.figure()
-    s = ipv.scatter(arr3[:, :,0], arr3[:, :,1], arr3[:, :,2], marker="sphere", color="blue", size=1)
-    ipv.scatter(arr2[:,0], arr2[:,1], arr2[:,2], marker="sphere", color="red", size=1)
-    ipv.animation_control(s, interval=interval)
+    lines = [[i, i+N] for i in range(len(selected))]
+
+    if connections:
+        s = ipv.scatter(xyz[:,:,0]*c, xyz[:,:,1]*c, xyz[:,:,2]*c, color="blue", marker="sphere")
+        d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+        p = ipv.plot_trisurf(x*c, y*c, z*c, lines=lines);
+        ipv.animation_control([d,s, p], interval=interval)
+    else:
+        s = ipv.scatter(xyz[:,:,0]*c, xyz[:,:,1]*c, xyz[:,:,2]*c, color="blue", marker="sphere")
+        ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+        ipv.animation_control(s, interval=interval)
+
+    ipv.xlim(-np.pi, np.pi);ipv.ylim(-np.pi, np.pi);ipv.zlim(-np.pi, np.pi);
     ipv.show()
 
 def plot_rotvec(angles_true):
