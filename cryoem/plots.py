@@ -170,31 +170,28 @@ def plot_iterations_polar_plot(q_all, angles_true, interval=1, connections=True,
     y = np.zeros((steps, 2*N))
     z = np.zeros((steps, 2*N))
     
-    x[0] = np.concatenate([xyz_true[:,0], xyz[0,:,0]])
-    y[0] = np.concatenate([xyz_true[:,1], xyz[0,:,1]])
-    z[0] = np.concatenate([xyz_true[:,2], xyz[0,:,2]])
-    for i in range(1, steps):
+    for i in range(0, steps):
         x[i] = np.concatenate([xyz_true[:,0], xyz[i,:,0]])
         y[i] = np.concatenate([xyz_true[:,1], xyz[i,:,1]])
         z[i] = np.concatenate([xyz_true[:,2], xyz[i,:,2]])
     
     ipv.figure()
-    lines = [[i, i+N] for i in range(len(selected))]
+    lines = [[i, i+N] for i in range(N)]
         
     if connections:
-        s = ipv.scatter(x, y, z, color="blue", marker="sphere")
-        d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+        s = ipv.scatter(xyz[:,:,0], xyz[:,:,1], xyz[:,:,2], color="blue", marker="sphere")
+        ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
         p = ipv.plot_trisurf(x, y, z, lines=lines);
-        ipv.animation_control([d,s, p], interval=interval)
+        ipv.animation_control([s, p], interval=interval)
     else:
-        s = ipv.scatter(x, y, z, color="blue", marker="sphere")
+        s = ipv.scatter(xyz[:,:,0], xyz[:,:,1], xyz[:,:,2], color="blue", marker="sphere")
         ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
         ipv.animation_control(s, interval=interval)
 
     ipv.xlim(-2*np.pi, 2*np.pi);ipv.ylim(-2*np.pi, 2*np.pi);ipv.zlim(-2*np.pi, 2*np.pi);
     ipv.show()
 
-def plot_iterations_rotvec(q_all, angles_true, interval=1, connections=True, selected=None, c=1):
+def plot_iterations_rotvec(q_all, angles_true, interval=1, connections=True, selected=None):
     ipv.clear()
     if q_all.shape[1] != angles_true.shape[0]:
         raise Exception("Should specify the same number of true angles and predicted angles")
@@ -238,24 +235,21 @@ def plot_iterations_rotvec(q_all, angles_true, interval=1, connections=True, sel
     y = np.zeros((steps, 2*N))
     z = np.zeros((steps, 2*N))
 
-    x[0] = np.concatenate([xyz_true[:,0], xyz[0,:,0]])
-    y[0] = np.concatenate([xyz_true[:,1], xyz[0,:,1]])
-    z[0] = np.concatenate([xyz_true[:,2], xyz[0,:,2]])
-    for i in range(1, steps):
+    for i in range(0, steps):
         x[i] = np.concatenate([xyz_true[:,0], xyz[i,:,0]])
         y[i] = np.concatenate([xyz_true[:,1], xyz[i,:,1]])
         z[i] = np.concatenate([xyz_true[:,2], xyz[i,:,2]])
 
     ipv.figure()
-    lines = [[i, i+N] for i in range(len(selected))]
+    lines = [[i, i+N] for i in range(N)]
 
     if connections:
-        s = ipv.scatter(xyz[:,:,0]*c, xyz[:,:,1]*c, xyz[:,:,2]*c, color="blue", marker="sphere")
-        d = ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
-        p = ipv.plot_trisurf(x*c, y*c, z*c, lines=lines);
-        ipv.animation_control([d,s, p], interval=interval)
+        s = ipv.scatter(xyz[:,:,0], xyz[:,:,1], xyz[:,:,2], color="blue", marker="sphere")
+        ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
+        p = ipv.plot_trisurf(x, y, z, lines=lines);
+        ipv.animation_control([s, p], interval=interval)
     else:
-        s = ipv.scatter(xyz[:,:,0]*c, xyz[:,:,1]*c, xyz[:,:,2]*c, color="blue", marker="sphere")
+        s = ipv.scatter(xyz[:,:,0], xyz[:,:,1], xyz[:,:,2], color="blue", marker="sphere")
         ipv.scatter(xyz_true[:,0], xyz_true[:,1], xyz_true[:,2], marker="sphere", color="red", size=2)
         ipv.animation_control(s, interval=interval)
 
