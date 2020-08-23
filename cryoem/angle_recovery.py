@@ -9,6 +9,9 @@ from cryoem.conversions import euler2quaternion, d_q, quaternion2euler
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
+from pathlib import Path
+
+# TODO: add constraint on quaternion Variables
 
 
 def angles_transpose(angles):
@@ -18,6 +21,8 @@ def angles_transpose(angles):
     idx[cols] = np.arange(len(cols))
     angles[:] = -angles[:, idx]
     return angles
+
+
 
 
 def train_angle_recovery(steps, 
@@ -136,6 +141,7 @@ def train_angle_recovery(steps,
             plt.close();
             time.sleep(0.1)
 
+            Path(file_name).mkdir(parents=True, exist_ok=True)
             np.savez(file_name, quaternion.normalize(q_predicted).numpy(), losses, np.array(collect_data))
 
             if found_minimizer:

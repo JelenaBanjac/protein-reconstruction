@@ -12,7 +12,8 @@ from cryoem.conversions import euler2quaternion, d_q
 fg_color = 'white'
 bg_color = 'black'
 
-def _plot(image, title, ax, colorbar=False, mean=0, var=0):
+def _plot(image, title, ax, colorbar=False):
+    # NOTE: used
     im = ax.imshow(image)
   
     # set title plus title color
@@ -31,7 +32,7 @@ def _plot(image, title, ax, colorbar=False, mean=0, var=0):
     if colorbar:
         cb = plt.colorbar(im)
         # set colorbar label plus label color
-        cb.set_label('Closeness', color=fg_color)
+        cb.set_label('Pixel value', color=fg_color)
 
         # set colorbar tick color
         cb.ax.yaxis.set_tick_params(color=fg_color)
@@ -42,14 +43,16 @@ def _plot(image, title, ax, colorbar=False, mean=0, var=0):
         # set colorbar ticklabels
         plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color=fg_color)
         
-def plot_projection(image, title, mean=0, var=0):
+def plot_projection(projection, angles):
+    # NOTE: used
+    projection = np.squeeze(projection)
+
     fig, ax = plt.subplots(1, 1, figsize=(7, 7))
     
-    _plot(image, title, ax, colorbar=True)
+    _plot(projection, f"Angles: {', '.join([f'{x:.2f}' for x in angles])} [rad]", ax, colorbar=True)
 
     fig.patch.set_facecolor(bg_color) 
     plt.tight_layout()
-    
     plt.show()
     
 def plot_projections(images, titles, nrows=2, ncols=5):
@@ -73,7 +76,8 @@ def save_space_plot(filename):
     ipv.savefig(f"{filename}.png")
 
 
-def plot_euclidean_space(angles):
+def plot_detector_pixels(angles):
+    # NOTE: used
     ipv.clear()
 
     if isinstance(angles[0], tf.Variable):
@@ -507,6 +511,7 @@ def plot_selected_angles_with_3rd_angle_magnitude(angles, angles_true, indices):
 ##################### Data Info Plots #####################
 
 def plot_angles_count(angles):
+    # NOTE: used
     sns.set(style="white", color_codes=True)
     sns.set(style="whitegrid")
 

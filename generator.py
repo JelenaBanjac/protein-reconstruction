@@ -15,6 +15,7 @@ parser.add("--angle-shift", "-shift", help="Get the start Euler angles that will
             action="append", type=float)
 parser.add("--angle-coverage", "-cov", help="The range (size of the interval) of the Euler angles aroung Z, Y, Z axes respectively. Example usage: -cov 0.0 -cov 0.0 -cov 0.0", 
             action="append", type=float)
+parser.add("--angles-gen-mode", "-ang-gen", help="Specify the mode of generating angles [uniform_S3, uniform_angles]")
 parser.add("--output-file", "-out", help="Name of output file containing projections with angles (with the extension)")
 args = parser.parse_args()
 
@@ -26,4 +27,5 @@ generate_2D_projections(input_file_path=args.input_file,
                         ProjNber=args.projections_num,
                         AngCoverage=args.angle_coverage,
                         AngShift=args.angle_shift,
+                        angles_gen_mode=args.angles_gen_mode,
                         output_file_name= args.output_file if args.output_file != "null" else None )

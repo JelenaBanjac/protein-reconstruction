@@ -6,7 +6,7 @@ from cryoem.rotation_matrices import RotationMatrix
 import astra
 
 
-def reconstruct(projections, angles, mrc_filename=True, transposed=False):
+def reconstruct(projections, angles, mrc_filename=None):
     # Generate orientation vectors based on angles
     orientation_vectors   = RotationMatrix(angles)
 
