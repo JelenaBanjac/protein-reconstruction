@@ -583,7 +583,7 @@ def plot_distances_count(angles_predicted, angles_true):
 #     return plt
 
 
-def plot_dP_dQ(dP_values, dQ_values):
+def plot_dP_dQ(dP_values, dQ_values, file_name=None):
     plt.clf()
     # Creating the dataframe for SNS plot
     data = {"d_Q" : dQ_values, #tr_y.numpy(),
@@ -601,6 +601,8 @@ def plot_dP_dQ(dP_values, dQ_values):
     #sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde", ax=ax[1]);  # "reg", "kde"
     x = np.arange(0, np.pi);
     sns.regplot(x=x, y=x, color="k", ax=ax)
+    if file_name:
+        plt.savefig(f"1{file_name}, dpi=150)
     plt.show();
 
     plt.clf()
@@ -617,6 +619,9 @@ def plot_dP_dQ(dP_values, dQ_values):
     plt.clf();
     #sns.scatterplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", ax=ax[0]);  # "reg", "kde"
     sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde");  # "reg", "kde"
+    
+    if file_name:
+        plt.savefig(f"2{file_name}, dpi=150)
     plt.show();
 
     # variance
@@ -626,3 +631,5 @@ def plot_dP_dQ(dP_values, dQ_values):
     ar_loss = lambda dQ_values, dP_values: tf.reduce_mean(tf.pow((dQ_values - dP_values), 2))
     loss = ar_loss(dQ_values, dP_values).numpy()
     print(f"Min. angle recovery loss possible = {loss}")
+
+    

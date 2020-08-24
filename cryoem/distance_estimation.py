@@ -29,6 +29,8 @@ from tensorflow.python.keras.applications.inception_v3 import InceptionV3
 from tensorflow.keras.losses import KLD, MAE, MSE
 from tensorflow.keras.utils import Sequence
 import pandas as pd
+import seaborn as sns
+import io
 
 num_dec = 1
 num_bins = 32
@@ -202,7 +204,7 @@ def create_siamese_network(input_shape):
     return Model(input_x, x)
 
 
-def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, limit_style, path_logs_training, training_description="", training_steps=None, validation_steps=None, plot=True, gpus=None):
+def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, limit_style, path_logs_training, training_description="", training_steps=None, validation_steps=None, plot=True, gpus=None, file_name=None):
     
     
     def d_p(p1, p2):
@@ -326,7 +328,7 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
         mses = history1.history['mse']
         val_mses = history1.history['val_mse']
         pathlib.Path(f"{path_logs_training}/losses").mkdir(parents=True, exist_ok=True)
-        np.savez(f"{path_logs_training}/losses/noisy_var{NOISY_VAR}.npz", training_loss, val_loss, mses, val_mses)
+        np.savez(f"{path_logs_training}/losses/losses.npz", training_loss, val_loss, mses, val_mses)
 
         if plot:
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,7))
@@ -346,6 +348,10 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
             ax2.legend()
             ax2.set_xlabel('Epoch')
             ax2.set_ylabel('Loss')
+            
+            if file_name:
+                plt.savefig(file_name)
+
             plt.show();
 
         return model, history1
