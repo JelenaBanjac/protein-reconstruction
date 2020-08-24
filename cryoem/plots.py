@@ -602,7 +602,7 @@ def plot_dP_dQ(dP_values, dQ_values, file_name=None):
     x = np.arange(0, np.pi);
     sns.regplot(x=x, y=x, color="k", ax=ax)
     if file_name:
-        plt.savefig(f"1{file_name}, dpi=150)
+        plt.savefig(f"1{file_name}", dpi=150)
     plt.show();
 
     plt.clf()
@@ -621,7 +621,7 @@ def plot_dP_dQ(dP_values, dQ_values, file_name=None):
     sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde");  # "reg", "kde"
     
     if file_name:
-        plt.savefig(f"2{file_name}, dpi=150)
+        plt.savefig(f"2{file_name}", dpi=150)
     plt.show();
 
     # variance
