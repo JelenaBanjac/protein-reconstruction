@@ -121,7 +121,7 @@ class DataGenerator(Sequence):
         #labels_and_weights = np.stack((labels, weights), axis=1)
         
         # [training_pairs[:, 0], training_pairs[:, 1]], labels
-        return [pairs[:, 0], pairs[:, 1]], labels 
+        return (pairs[:, 0], pairs[:, 1]), labels 
         
     #def _get_weights(self, labels):
     #    l = labels.numpy()
