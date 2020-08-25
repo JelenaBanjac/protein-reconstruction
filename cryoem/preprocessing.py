@@ -2,26 +2,26 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 import os
 import math
+from skimage.transform import rescale
 
 def global_standardization(X):
     """Does not have all the positive piels
     Ref: https://machinelearningmastery.com/how-to-manually-scale-image-pixel-data-for-deep-learning/""" 
-    print(f'Image shape: {X[0].shape}')
-    print(f'Data Type: {X[0].dtype}')
+    print("Global standardization")
+    print(f'\tImage shape: {X[0].shape}')
+    print(f'\tData Type: {X[0].dtype}')
     X = X.astype('float32')
 
-    print("***")
-    ## GLOBAL STANDARDIZATION
     # calculate global mean and standard deviation
     mean, std = X.mean(), X.std()
-    print(f'Mean: {mean:.3f} | Std: {std:.3f}')
-    print(f'Min:  {X.min():.3f} | Max: {X.max():.3f}')
+    print(f'\tMean: {mean:.3f} | Std: {std:.3f}')
+    print(f'\tMin:  {X.min():.3f} | Max: {X.max():.3f}')
     # global standardization of pixels
     X = (X - mean) / std
     # confirm it had the desired effect
     mean, std = X.mean(), X.std()
-    print(f'Mean: {mean:.3f} | Std: {std:.3f}')
-    print(f'Min:  {X.min():.3f} | Max: {X.max():.3f}')
+    print(f'\tMean: {mean:.3f} | Std: {std:.3f}')
+    print(f'\tMin:  {X.min():.3f} | Max: {X.max():.3f}')
     
     return X
 
@@ -56,34 +56,44 @@ def rescale_images(original_images):
         if original_images.shape[1] <= dim:
             dim_goal = dim
             break;
-    print(f"Image rescaled from dimension {original_images.shape[1]} to {dim_goal} for MobileNet")
+    print(f"Image rescaled: from dimension {original_images.shape[1]} to {dim_goal} for MobileNet")
     scale = dim_goal/original_images.shape[1]
     images = np.empty((original_images.shape[0], dim_goal, dim_goal))
     for i, original_image in enumerate(original_images):
         images[i] = rescale(original_image, (scale, scale), multichannel=False)
+
     return images
 
-def gaussian_noise(shape, mean=0, var=0.1): 
-    sigma = var**0.5
-    gauss = np.random.normal(mean, sigma, (shape[0], shape[1]))
-    gauss = gauss.reshape(shape[0], shape[1])
-    return gauss
+# def gaussian_noise(shape, mean=0, var=0.1): 
+#     sigma = var**0.5
+#     gauss = np.random.normal(mean, sigma, (shape[0], shape[1]))
+#     gauss = gauss.reshape(shape[0], shape[1])
+#     return gauss
 
 def add_gaussian_noise(projections, noise_var):
     """
     projections = add_gaussian_noise(projections, NOISY_VAR)
     """
+    print("Noise:", sep=" ")
+    if noise_var==0:
+        print("No noise")
+        return projections
     noise_sigma   = noise_var**0.5
     nproj,row,col = projections.shape
     gauss_noise   = np.random.normal(0,noise_sigma,(nproj,row,col))
     gauss_noise   = gauss_noise.reshape(nproj,row,col) 
     projections   = projections + gauss_noise
+    print(f"Variance={noise_var}")
     return projections
 
 def add_triangle_translation(projections, left_limit, peak_limit, right_limit):
     """
     projections = add_triangle_translation(projections, left_limit=-TRANSLATION, peak_limit=0, right_limit=TRANSLATION)
     """
+    print("Translation:", sep=" ")
+    if left_limit==0 and right_limit==0:
+        print("No translation")
+        return projections
     horizontal_shift = np.random.triangular(left_limit, peak_limit, right_limit, len(projections))
     vertical_shift   = np.random.triangular(left_limit, peak_limit, right_limit, len(projections))
     for i, (hs, vs) in enumerate(zip(horizontal_shift, vertical_shift)):
@@ -91,6 +101,7 @@ def add_triangle_translation(projections, left_limit, peak_limit, right_limit):
         projections[i] = np.roll(projections[i], int(hs), axis=0)
         # shift 1 place in vertical axis
         projections[i] = np.roll(projections[i], int(vs), axis=1) 
+    print(f"left_limit={left_limit}, peak_limit={peak_limit}, right_limit={right_limit}")
     return projections
 
 def channels_setup(X, channels="gray"):
@@ -102,6 +113,9 @@ def channels_setup(X, channels="gray"):
     return X
 
 def preprocessing(projections, noise_var, left_limit, peak_limit, right_limit, channels):
+    print("--- Preprocessing projections ---")
+    projections = rescale_images(projections)
+
     # add gaussian noise
     projections = add_gaussian_noise(projections, noise_var)
 
