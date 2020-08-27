@@ -22,7 +22,22 @@ def angles_transpose(angles):
     angles[:] = -angles[:, idx]
     return angles
 
+def quaternion_constraint(low_ang, high_ang):
+    
+    def _inner(q):
+        e = quaternion2euler(q)
 
+        a0, a1, a2 = tf.unstack(e, axis=-1)
+        a0 = tf.clip_by_value(a0, low_ang[0], high_ang[0])
+        a1 = tf.clip_by_value(a1, low_ang[1], high_ang[1])
+        a2 = tf.clip_by_value(a2, low_ang[2], high_ang[2])
+
+        e_new = tf.stack((a0, a1, a2), axis=-1)
+        q_new = euler2quaternion(e_new)
+        return q_new
+
+    return _inner
+    
 
 
 def train_angle_recovery(steps, 
@@ -31,11 +46,12 @@ def train_angle_recovery(steps,
                          distance_fn, 
                          file_name,
                          limit_distance=np.pi,
-                         q_predicted=None,
-                         angles_true=None,
                          low_ang_const=[0.0, 0.0, 0.0],
                          high_ang_const=[2.0, 0.4, 2.0],
-                         learning_rate=0.01): 
+                         q_predicted=None,
+                         angles_true=None,
+                         learning_rate=0.01,
+                        constraint=False): 
 
     time_start = time.time()
     collect_data = []
@@ -50,10 +66,16 @@ def train_angle_recovery(steps,
                           size=(len(in_data), 3))
     if q_predicted:
         # continue where left off
-        q_predicted = [tf.Variable(q) for q in q_predicted]
+        if constraint:
+            q_predicted = [tf.Variable(q, constraint=quaternion_constraint(low_ang, high_ang)) for q in q_predicted]
+        else:
+            q_predicted = [tf.Variable(q) for q in q_predicted]
     else:
         # optimize from scratch
-        q_predicted = [tf.Variable(q) for q in euler2quaternion(euler)]
+        if constraint:
+            q_predicted = [tf.Variable(q, constraint=quaternion_constraint(low_ang, high_ang)) for q in euler2quaternion(euler)]
+        else:
+            q_predicted = [tf.Variable(q) for q in euler2quaternion(euler)]
 
     if in_data.shape[1] == 3:
         in_data = euler2quaternion(in_data)
