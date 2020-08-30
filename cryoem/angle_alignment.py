@@ -229,6 +229,7 @@ def training_angle_alignment(num_runs, steps, batch_size, optimizer, angles_true
     
     # PLOT RESULT
     q_true = euler2quaternion(angles_true)
+    q_predicted = euler2quaternion(angles_predicted)
     sns.set(style="white", color_codes=True)
     sns.set(style="whitegrid")
 

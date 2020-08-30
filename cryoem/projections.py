@@ -18,22 +18,6 @@ import pathlib
 import h5py
 from cryoem.rotation_matrices import RotationMatrix
 
-
-
-def project_volume(Vol, Angles, Vol_geom, ProjSize):
-    # Generate orientation vectors based on angles
-    Orientation_Vectors   = RotationMatrix(Angles)
-
-    # Create projection 2D geometry in ASTRA
-    Proj_geom = astra.create_proj_geom('parallel3d_vec', ProjSize, ProjSize, Orientation_Vectors)
-
-    # Generate projs 
-    _, Proj_data = astra.create_sino3d_gpu(Vol, Proj_geom, Vol_geom)
-
-    # Reshape projections correctly 
-    Projections = np.transpose(Proj_data, (1, 0, 2))
-
-    return  Projections	
  
 def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra, angles_gen_mode="uniform_angles"):
     """
@@ -75,8 +59,17 @@ def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra, angles
     else:
         raise NotImplemented("Please specify angles_gen_mode parameter that represents how angles will be generated")
     
-    # Generate projections
-    Projections = project_volume(Vol, angles, Vol_geom, ProjSize)
+    # Generate orientation vectors based on angles
+    Orientation_Vectors   = RotationMatrix(angles)
+
+    # Create projection 2D geometry in ASTRA
+    Proj_geom = astra.create_proj_geom('parallel3d_vec', ProjSize, ProjSize, Orientation_Vectors)
+
+    # Generate projs 
+    _, Proj_data = astra.create_sino3d_gpu(Vol, Proj_geom, Vol_geom)
+
+    # Reshape projections correctly 
+    Projections = np.transpose(Proj_data, (1, 0, 2))
 
     return Projections, angles
 

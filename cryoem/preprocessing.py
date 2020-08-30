@@ -48,20 +48,24 @@ def positive_global_standardization(X):
     
     return X
 
-def rescale_images(original_images):
+def rescale_images(original_images, rescale_dim=128):
     mobile_net_possible_dims = [128, 160, 192, 224]
-    dim_goal = 128
+    #rescale_dim = 128
+
+    original_images = np.array(original_images)
+    #print(original_images.shape)
+    #print(type(original_images))
     
-    for dim in mobile_net_possible_dims:
-        if original_images.shape[1] <= dim:
-            dim_goal = dim
-            break;
-    print(f"Image rescaled: from dimension {original_images.shape[1]} to {dim_goal} for MobileNet")
-    scale = dim_goal/original_images.shape[1]
-    images = np.empty((original_images.shape[0], dim_goal, dim_goal))
+#     for dim in mobile_net_possible_dims:
+#         if original_images.shape[1] <= dim:
+#             rescale_dim = dim
+#             break;
+    
+    scale = rescale_dim/original_images.shape[1]
+    images = np.empty((original_images.shape[0], rescale_dim, rescale_dim))
     for i, original_image in enumerate(original_images):
         images[i] = rescale(original_image, (scale, scale), multichannel=False)
-
+    print(f"Image rescaled: from dimension {original_images.shape[1]} to {rescale_dim}")
     return images
 
 # def gaussian_noise(shape, mean=0, var=0.1): 
@@ -75,15 +79,15 @@ def add_gaussian_noise(projections, noise_var):
     projections = add_gaussian_noise(projections, NOISY_VAR)
     """
     print("Noise:", sep=" ")
+    print("Variance=", noise_var)
     if noise_var==0:
         print("No noise")
         return projections
     noise_sigma   = noise_var**0.5
-    nproj,row,col = projections.shape
-    gauss_noise   = np.random.normal(0,noise_sigma,(nproj,row,col))
-    gauss_noise   = gauss_noise.reshape(nproj,row,col) 
+    gauss_noise   = np.random.normal(0, noise_sigma, projections.shape)
+    gauss_noise   = gauss_noise.reshape(*projections.shape) 
     projections   = projections + gauss_noise
-    print(f"Variance={noise_var}")
+
     return projections
 
 def add_triangle_translation(projections, left_limit, peak_limit, right_limit):
@@ -104,31 +108,42 @@ def add_triangle_translation(projections, left_limit, peak_limit, right_limit):
     print(f"left_limit={left_limit}, peak_limit={peak_limit}, right_limit={right_limit}")
     return projections
 
-def channels_setup(X, channels="gray"):
-    if channels == "rgb":
+def channels_setup(X, channels=1):
+    if channels == 3: # rgb images
         X = np.stack((X,)*3, axis=-1)
-    elif channels == "gray":
+    elif channels == 1: # gray-scale 
         X = X[:,:,:,np.newaxis]
 
     return X
 
-def preprocessing(projections, noise_var, left_limit, peak_limit, right_limit, channels):
+def preprocessing(projections, PROJECTIONS_NUM_SINGLE, rescale_dim, noise_var_scale, left_limit, peak_limit, right_limit, channels):
     print("--- Preprocessing projections ---")
-    projections = rescale_images(projections)
+    projections_new = np.empty((len(projections), rescale_dim, rescale_dim, channels))
+    
+    for i in range(0, len(projections), PROJECTIONS_NUM_SINGLE):
+        print("Protein #", i//PROJECTIONS_NUM_SINGLE+1)
+        protein_projections = np.empty((PROJECTIONS_NUM_SINGLE, *projections[i].shape))
+        for j in range(PROJECTIONS_NUM_SINGLE):
+            protein_projections[j] = projections[i+j]
+            
+        protein_projections = rescale_images(protein_projections, rescale_dim)
 
-    # add gaussian noise
-    projections = add_gaussian_noise(projections, noise_var)
+        
+        # normalize pixel values
+        protein_projections = global_standardization(protein_projections)
+        
+        # add gaussian noise
+        protein_projections = add_gaussian_noise(protein_projections, noise_var=noise_var_scale*np.max(protein_projections))
 
-    # add translation
-    projections = add_triangle_translation(projections, left_limit=left_limit, peak_limit=peak_limit, right_limit=right_limit)
+        # add translation
+        protein_projections = add_triangle_translation(protein_projections, left_limit=left_limit, peak_limit=peak_limit, right_limit=right_limit)
+        
+        # rgb or gray scale images
+        protein_projections = channels_setup(protein_projections, channels)
 
-    # normalize pixel values
-    projections = global_standardization(projections)
-
-    # rgb or gray scale images
-    projections = channels_setup(projections, channels)
-
-    return projections
+        projections_new[i:i+PROJECTIONS_NUM_SINGLE] = protein_projections
+        
+    return projections_new
 
 def train_val_test_split(projections_num, test_size=0.33, val_size=0.25, train_percent=0.01, val_percent=0.01, indices_file="../data/train_val_test_indices.npz"):
     if not os.path.exists(indices_file):

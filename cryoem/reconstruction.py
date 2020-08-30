@@ -7,7 +7,7 @@ import astra
 import mrcfile
 from pathlib import Path
 
-def reconstruct(projections, angles, mrc_filename=None):
+def reconstruct(projections, angles, mrc_filename=None, overwrite=False):
     # Generate orientation vectors based on angles
     orientation_vectors   = RotationMatrix(angles)
 
@@ -46,7 +46,7 @@ def reconstruct(projections, angles, mrc_filename=None):
     # Save reconstruction to mrc file for chimera
     if mrc_filename:
         Path(mrc_filename).parent.mkdir(parents=True, exist_ok=True)
-        with mrcfile.new(mrc_filename) as mrc:
+        with mrcfile.new(mrc_filename, overwrite=overwrite) as mrc:
             mrc.set_data(reconstruction)
         
     return reconstruction
