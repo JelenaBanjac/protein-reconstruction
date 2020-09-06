@@ -209,16 +209,17 @@ def training_angle_alignment(num_runs, steps, batch_size, optimizer, angles_true
             d['collect_data'].append(collect_data)
             d['trajectory'].append(trajectory)
             print(losses[-1])
-            if losses[-1] < threshold:
+            if threshold and losses[-1] < threshold:
                 break;
-        if losses[-1] < threshold:
+        if threshold and losses[-1] < threshold:
             break;
     else:
-        plt.clf();
-        plt.close();
-        IPyDisplay.clear_output(wait=True)
-        print(f"Haven't found the solution less than threshold {threshold}")
-        return None, None, None, None, None
+        if threshold:
+            plt.clf();
+            plt.close();
+            IPyDisplay.clear_output(wait=True)
+            print(f"Haven't found the solution less than threshold {threshold}")
+            return None, None, None, None, None
     
     plt.close();
     IPyDisplay.clear_output(wait=True)
