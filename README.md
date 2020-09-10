@@ -22,36 +22,36 @@ Also, it contains the notebooks with different combinations of project approache
 First, download and install Anaconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
 
 Then open the terminal and type following:
-```
+```bash
 # clone the repo
-$ git clone https://github.com/JelenaBanjac/protein-reconstruction.git
+git clone https://github.com/JelenaBanjac/protein-reconstruction.git
 
 # position yourself inside the project
-$ cd protein-reconstruction
+cd protein-reconstruction
 
 # create environment
-$ conda env create -f environment.yml
+conda env create -f environment.yml
 
 # activate environment
-$ conda activate protein_reconstruction
+conda activate protein_reconstruction
 ```
 Now you are able to use the code and run the notebooks you wish!
 
 [Optional] Test if some dependencies are installed:
-```
+```bash
 # tensorflow check
-$ python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
+python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
 # o/w install with: 
-$ pip3 install tensorflow-gpu
-$ pip3 install tensorflow-graphics
+pip3 install tensorflow-gpu
+pip3 install tensorflow-graphics
 
 # astra toolbox check
-$ python3 -c "import astra;astra.test_CUDA()"
+python3 -c "import astra;astra.test_CUDA()"
 ```
 
 ## Run
 
-```
+```bash
 usage: generator.py [-h] --config-file CONFIG_FILE [--input-file INPUT_FILE]
                     [--projections-num PROJECTIONS_NUM]
                     [--angle-shift ANGLE_SHIFT]
@@ -86,12 +86,21 @@ optional arguments:
 ```
 
 Main use is:
-```
+```bash
 # read the settings from config file
 python generator.py -config protein.config
 
 # almost half sphere (overrides config default values)
 python generator.py -conf protein.config --input-file data/5j0n.mrc -num 5000 -shift 0.0 -shift 0.0 -shift 0.0 -cov 2.0 -cov 0.4 -cov 2.0
+```
+
+Run the jupyter notebook:
+
+```bash
+cd $HOME/protein-reconstruction/notebooks
+source activate protein_reconstruction
+export CUDA_VISIBLE_DEVICES=$1
+nohup $HOME/miniconda/envs/protein_reconstruction/bin/jupyter notebook --ip=0.0.0.0 --port=$2 &
 ```
 
 ## Misc information
