@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Protein 3D Poses Recovery &#8212; Protein 3D Poses Recovery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/jupyter-sphinx.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/sphinx-book-theme.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/mystnb.js"></script>
+    <script src="_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Phase 0: Data Generation" href="phase0_intro.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="index.html">
+  
+  <img src="_static/logo.gif" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Protein 3D Poses Recovery</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <p class="caption">
+ <span class="caption-text">
+  Notebooks
+ </span>
+</p>
+<ul class="nav sidenav_l1">
+ <li class="toctree-l1">
+  <a class="reference internal" href="phase0_intro.html">
+   Phase 0: Data Generation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="phase1_intro.html">
+   Phase 1: Distance Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="phase2_intro.html">
+   Phase 2: Orientation Recovery
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="phase3_intro.html">
+   Phase 3: Reconstruction
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/home.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction//issues/new?title=Issue%20on%20page%20%2Fhome.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summary">
+   Summary
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#general-flow">
+   General Flow
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#report">
+   Report
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#repository">
+   Repository
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#package-versions">
+   Package versions
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#logbook">
+   Logbook
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#team">
+   Team
+  </a>
+ </li>
+</ul>
+
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="protein-3d-poses-recovery">
+<h1>Protein 3D Poses Recovery<a class="headerlink" href="#protein-3d-poses-recovery" title="Permalink to this headline">¶</a></h1>
+<p><strong>3D Poses Recovery in Single-Particle Cryo-EM from Learned Pairwise Projection Distances</strong></p>
+<p>The topic of this project is to learn pairwise projection distances in order to recover the angles at which we imaged these 2D projections from a given 3D protein.</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>Single-particle cryo-electron microscopy (cryo-EM) is a technology that allows the observation and the high-resolution 3D structure determination of biomolecules. In this project, the goal is to estimate the angles at which we imaged the 2D projections from a given 3D protein (cf illustration bellow). We developed deep learning models to estimate the angles from learned pairwise projection distances. We designed a two-step method: 1) <strong>distance estimation</strong> using a Siamese neural network to learn the distance between pairs of projections, and 2) <strong>angle recovery</strong> that includes a minimization scheme in order to estimate the angles at which each projection was taken. The current results obtained are discussed depending on different combination of approaches used andexperimental conditions.
+<img alt="images/spcryoem.png" src="_images/spcryoem.png" /></p>
+</div>
+<div class="section" id="general-flow">
+<h2>General Flow<a class="headerlink" href="#general-flow" title="Permalink to this headline">¶</a></h2>
+<p>General flow of the project can be seen in the illustration bellow:
+<img alt="images/protein_flow.png" src="_images/protein_flow.png" /></p>
+</div>
+<div class="section" id="report">
+<h2>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h2>
+<p>More details on the implementation can be found in the <span class="xref myst">report</span>.<br />
+The presentation slideshow can be found on this <a class="reference external" href="https://docs.google.com/presentation/d/e/2PACX-1vSeN_Zd4mL9ScdvlEAIib4QFq3kkUxojnj-YBEAGuxKxPDQ48PCL2Y_JBT4cn_UBcIFhPp_YnNZZF1c/pub?start=true&amp;loop=false&amp;delayms=3000">link</a> and the presentation material on this <span class="xref myst">link</span>.</p>
+</div>
+<div class="section" id="repository">
+<h2>Repository<a class="headerlink" href="#repository" title="Permalink to this headline">¶</a></h2>
+<p>This repository contains scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes.
+Also, it contains the notebooks with different combinations of project approaches.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>First, download and install Anaconda on your machine, link <a class="reference external" href="https://www.anaconda.com/products/individual">here</a>. Note: the project was developed with Python 3.6+.</p>
+<p>Then open the terminal and type following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># clone the repo
+$ git clone https://github.com/JelenaBanjac/protein-reconstruction.git
+
+# position yourself inside the project
+$ cd protein-reconstruction
+
+# create environment
+$ conda env create -f environment.yml
+
+# activate environment
+$ conda activate protein_reconstruction
+</pre></div>
+</div>
+<p>Now you are able to use the code and run the notebooks you wish!</p>
+<p>[Optional] Test if some dependencies are installed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># tensorflow check
+$ python3 -c &quot;import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))&quot;
+# o/w install with: 
+$ pip3 install tensorflow-gpu
+$ pip3 install tensorflow-graphics
+
+# astra toolbox check
+$ python3 -c &quot;import astra;astra.test_CUDA()&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="package-versions">
+<h2>Package versions<a class="headerlink" href="#package-versions" title="Permalink to this headline">¶</a></h2>
+<p>The following versions of the packages are used in the project.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span><span class="o">-</span><span class="mf">3.6</span><span class="o">.</span><span class="mi">8</span>
+<span class="n">cudnn</span><span class="o">-</span><span class="mf">7.1</span><span class="o">.</span><span class="mi">3</span>
+<span class="n">cudatoolkit</span><span class="o">-</span><span class="mf">8.0</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cuda</span> <span class="mi">10</span>
+<span class="n">cuDNN</span> <span class="mi">7</span>
+<span class="n">nvidia</span> <span class="n">driver</span> <span class="mi">415</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ nvcc --version
+$ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+</pre></div>
+</div>
+</div>
+<div class="section" id="logbook">
+<h2>Logbook<a class="headerlink" href="#logbook" title="Permalink to this headline">¶</a></h2>
+<p>Notes taken during the project development:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://app.box.com/s/8heyh18d473xetiqzu1eorkzk29ax40e">Experiments notes</a></p></li>
+<li><p><a class="reference external" href="https://app.box.com/s/0x42ke3j5e6yyoomlhukcayf4qz3ezgw">Meeting notes</a></p></li>
+<li><p><a class="reference external" href="https://app.box.com/s/ndgnxrgompchlhr7o2hoqaalacjp98hd">Summary notes of work left to be done after first 4 months</a></p></li>
+</ul>
+</div>
+<div class="section" id="team">
+<h2>Team<a class="headerlink" href="#team" title="Permalink to this headline">¶</a></h2>
+<p><strong>Student:</strong><br />
+<a class="reference external" href="https://jelenabanjac.com">Jelena Banjac</a>, jelena.banjac&#64;epfl.ch, Data Science Master Student</p>
+<p><strong>Supervisors:</strong><br />
+<a class="reference external" href="https://people.epfl.ch/laurene.donati?lang=en">Laurène Donati</a>, laurene.donati&#64;epfl.ch, BIG, EPFL<br />
+<a class="reference external" href="https://deff.ch/">Michaël Defferrard</a>, michael.defferrard&#64;epfl.ch, LTS2, EPFL</p>
+<p><strong>Professor:</strong><br />
+<a class="reference external" href="http://bigwww.epfl.ch/unser/">Michaël Unser</a>, michael.unser&#64;epfl.ch, BIG, EPFL</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='right-next' id="next-link" href="phase0_intro.html" title="next page">Phase 0: Data Generation</a>
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Jelena Banjac<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="_static/js/index.js"></script>
+    
+  </body>
+</html>
