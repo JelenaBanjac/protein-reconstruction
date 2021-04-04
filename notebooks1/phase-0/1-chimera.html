@@ -1,0 +1,339 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Using Chimera to Create CryoEM Data &#8212; Protein 3D Poses Recovery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/mystnb.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Generate 2D Projections with Angles" href="2-generate-projections-and-angles.html" />
+    <link rel="prev" title="Phase 0: Data Generation" href="../../phase0_intro.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  <img src="../../_static/logo.gif" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Protein 3D Poses Recovery</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <p class="caption">
+ <span class="caption-text">
+  Notebooks
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 current active">
+  <a class="reference internal" href="../../phase0_intro.html">
+   Phase 0: Data Generation
+  </a>
+  <ul class="current">
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Chimera
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="2-generate-projections-and-angles.html">
+     Data Generation and Exploration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="3-coverage-comparisons.html">
+     Different Sphere Coverage Comparisons
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../phase1_intro.html">
+   Phase 1: Distance Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../phase2_intro.html">
+   Phase 2: Orientation Recovery
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../phase3_intro.html">
+   Phase 3: Reconstruction
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/notebooks1/phase-0/1-chimera.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction//issues/new?title=Issue%20on%20page%20%2Fnotebooks1/phase-0/1-chimera.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lambda-excision-hj-intermediate-5j0n-asymmetric">
+   Lambda excision HJ intermediate -
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     5j0n
+    </span>
+   </code>
+   (asymmetric)
+  </a>
+ </li>
+</ul>
+
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="using-chimera-to-create-cryoem-data">
+<h1>Using Chimera to Create CryoEM Data<a class="headerlink" href="#using-chimera-to-create-cryoem-data" title="Permalink to this headline">¶</a></h1>
+<p>First, we created faithful Cryo-EM data for the neural networks training (including the imaging parameters that you can play with).
+This is done by generating these ground truths from scratch.</p>
+<p>The steps for generating simulation data with <a class="reference external" href="https://www.cgl.ucsf.edu/chimera/">chimera</a>:</p>
+<ul class="simple">
+<li><p><strong>Chimera software:</strong> Download chimera from this <a class="reference external" href="https://www.cgl.ucsf.edu/chimera/download.html">page</a>.</p></li>
+<li><p><strong>Protein in PDB:</strong> Find a protein that interests you in the <a class="reference external" href="https://www.rcsb.org/">Protein Data Bank (PDB)</a> (let’s say we take beta-galactosidase, with PDB ID <a class="reference external" href="https://www.rcsb.org/structure/5A1A"><strong>5J0N</strong></a>).</p></li>
+<li><p><strong>PDB model:</strong> Open chimera and import that protein: File -&gt; Fetch By ID… -&gt; Select PDB and type the PDB ID of the protein -&gt; Fetch. Now you will see the 3D structure of the protein.</p></li>
+<li><p><strong>Create reference map from PDB model:</strong> Modify the density of the protein: Tools -&gt; General Controls -&gt; Command Line -&gt; Type: <code class="docutils literal notranslate"><span class="pre">molmap</span> <span class="pre">#0</span> <span class="pre">5</span></code> (molmap = is command that generates a density map from the specified atom; # is atom specification, i.e. number assigned to the model by default; 5 = resolution which for us does not have sense to work with resolutions above 15, we will have proteins around 2 or 3 Angstrom).</p></li>
+<li><p><strong>Store reference map as MRC</strong>: Save to a file: Tools -&gt; Volume Data -&gt; Volume Viewer -&gt; File -&gt; Save map as… -&gt; Give it the <code class="docutils literal notranslate"><span class="pre">protein_PDB_ID.mrc</span></code>.</p></li>
+</ul>
+<p>References for more information:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="http://molecularart.dk/2015/10/cryo-em-how-to-generate-an-initial-reference-map-from-pdb/">Cryo-EM: How to generate an initial reference map from PDB</a></p></li>
+<li><p><a class="reference external" href="https://munfred.com/proteins.pdf">Eduardo’s Guide for 3D Printing Proteins</a>.</p></li>
+</ul>
+<p>We will be working mainly on this protein: <strong>5j0n</strong> (asymmetric).</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">nglview</span> <span class="k">as</span> <span class="nn">nv</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "3da9f065c4c740cda95984081bf90c4b", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<div class="section" id="lambda-excision-hj-intermediate-5j0n-asymmetric">
+<h2>Lambda excision HJ intermediate - <code class="docutils literal notranslate"><span class="pre">5j0n</span></code> (asymmetric)<a class="headerlink" href="#lambda-excision-hj-intermediate-5j0n-asymmetric" title="Permalink to this headline">¶</a></h2>
+<p>More information on the protein can be found <a class="reference external" href="https://www.rcsb.org/structure/5j0n">here</a>. Following are the atomic model and density map of the protein respectively.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PROTEIN</span> <span class="o">=</span> <span class="s2">&quot;5j0n&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">view_atomic</span> <span class="o">=</span> <span class="n">nv</span><span class="o">.</span><span class="n">show_pdbid</span><span class="p">(</span><span class="n">PROTEIN</span><span class="p">)</span>
+<span class="n">view_atomic</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "f8fb84f36b1f43e187abaa2da63e9042", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">view_density_map</span> <span class="o">=</span> <span class="n">nv</span><span class="o">.</span><span class="n">show_file</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;../data/</span><span class="si">{PROTEIN}</span><span class="s2">.mrc&quot;</span><span class="p">)</span>
+<span class="n">view_density_map</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "fea679412e9144d4b3f559b8853b11b5", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks1/phase-0"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='left-prev' id="prev-link" href="../../phase0_intro.html" title="previous page">Phase 0: Data Generation</a>
+    <a class='right-next' id="next-link" href="2-generate-projections-and-angles.html" title="next page">Generate 2D Projections with Angles</a>
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Jelena Banjac<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="../../_static/js/index.js"></script>
+    
+  </body>
+</html>

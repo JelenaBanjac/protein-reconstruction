@@ -1,0 +1,552 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>Generate 2D Projections with Angles &#8212; Protein 3D Poses Recovery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
+    <link href="../../_static/css/index.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/jupyter-sphinx.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/mystnb.js"></script>
+    <script src="../../_static/sphinx-book-theme.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Compare Different Coverage Distributions" href="3-coverage-comparisons.html" />
+    <link rel="prev" title="Using Chimera to Create CryoEM Data" href="1-chimera.html" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="docsearch:language" content="en">
+
+
+
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+<a class="navbar-brand text-wrap" href="../../index.html">
+  
+  <img src="../../_static/logo.gif" class="logo" alt="logo">
+  
+  
+  <h1 class="site-logo" id="site-title">Protein 3D Poses Recovery</h1>
+  
+</a>
+</div>
+
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form>
+
+<nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <p class="caption">
+ <span class="caption-text">
+  Notebooks
+ </span>
+</p>
+<ul class="current nav sidenav_l1">
+ <li class="toctree-l1 current active">
+  <a class="reference internal" href="../../phase0_intro.html">
+   Phase 0: Data Generation
+  </a>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="1-chimera.html">
+     Chimera
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     Data Generation and Exploration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="3-coverage-comparisons.html">
+     Different Sphere Coverage Comparisons
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../phase1_intro.html">
+   Phase 1: Distance Function
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../phase2_intro.html">
+   Phase 2: Orientation Recovery
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../phase3_intro.html">
+   Phase 3: Reconstruction
+  </a>
+ </li>
+</ul>
+
+</nav>
+
+ <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="row topbar fixed-top container-xl">
+    <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show">
+    </div>
+    <div class="col pl-2 topbar-main">
+        
+        <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+            data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+            aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+            title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+            <i class="fas fa-bars"></i>
+            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        
+        <div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../../_sources/notebooks1/phase-0/2-generate-projections-and-angles.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+    
+</div>
+        <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction//issues/new?title=Issue%20on%20page%20%2Fnotebooks1/phase-0/2-generate-projections-and-angles.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+
+        <!-- Full screen (wrap in <a> to have style consistency -->
+        <a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+                data-placement="bottom" onclick="toggleFullScreen()" title="Fullscreen mode"><i
+                    class="fas fa-expand"></i></button></a>
+
+        <!-- Launch buttons -->
+
+    </div>
+
+    <!-- Table of contents -->
+    <div class="d-none d-md-block col-md-2 bd-toc show">
+        <div class="tocsection onthispage pt-5 pb-3">
+            <i class="fas fa-list"></i> Contents
+        </div>
+        <nav id="bd-toc-nav">
+            <ul class="nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#full-sphere-coverage-uniform-on-mathbb-s-2-5k-projections">
+   Full-Sphere Coverage - Uniform on
+   <span class="math notranslate nohighlight">
+    \(\mathbb{S}^2\)
+   </span>
+   - 5K Projections
+  </a>
+ </li>
+</ul>
+
+        </nav>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="generate-2d-projections-with-angles">
+<h1>Generate 2D Projections with Angles<a class="headerlink" href="#generate-2d-projections-with-angles" title="Permalink to this headline">¶</a></h1>
+<p>From the 3D protein structure, we want to generate 2D projections that were taken at different angles. This is done using the <code class="docutils literal notranslate"><span class="pre">cryoem</span></code> software tools implemented in this project that rely on <a class="reference external" href="https://github.com/astra-toolbox/astra-toolbox">Astra Toolbox</a>.</p>
+<p>In this notebook we visualize the output of this generator. We have two main spaces we visualize the data:</p>
+<ul class="simple">
+<li><p><span class="xref myst"><span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span> space</span> which we use to represent the sampled directions. These directions represents at which angles the ray was sent through the protein. Imagine the protein in the center of the coordinate system and the potential ray positions cover the sphere around that protein with the fixed radius (i.e. only the border of the sphere is filled, the sphere itself is empty). It can also be described as camera positions around the protein. Only two angles <span class="math notranslate nohighlight">\((\theta_2, \theta_1)\)</span> represent the direction and they are used for visualization.</p></li>
+<li><p><a class="reference external" href="https://en.wikipedia.org/wiki/3D_rotation_group"><span class="math notranslate nohighlight">\(\mathbf{SO}(3)\)</span> space</a> with the topology explained <a class="reference external" href="https://en.wikipedia.org/wiki/3D_rotation_group#Topology">here</a>. The possible positions fill the ball with radius that is in the range from <span class="math notranslate nohighlight">\(-\pi\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>. For every point in this ball there is a rotation, with axis through the point and the origin, and rotation angle equal to the distance of the point from the origin. All three angles <span class="math notranslate nohighlight">\((\theta_3, \theta_2, \theta_1)\)</span> are used for the visualization.</p></li>
+</ul>
+<p>Note: The goal of this project is to recover these positions of angles on the sphere only using the projections (images) not knowing the angle at which they were taken.</p>
+<p>Following command line will be used to run the script for generating 2D projections with angles. Note: <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">../..</span></code> is just locating into the root of this project. So if you run it in the root, you don’t need it.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!python ../../generator.py --help
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>Warning: To use the exr data format, please install the OpenEXR package following the instructions detailed in the README at github.com/tensorflow/graphics.
+Warning: To use the threejs_vizualization, please install the colabtools package following the instructions detailed in the README at github.com/tensorflow/graphics.
+usage: generator.py [-h] [--config-file CONFIG_FILE] [--input-file INPUT_FILE]
+                    [--projections-num PROJECTIONS_NUM]
+                    [--angle-shift ANGLE_SHIFT]
+                    [--angle-coverage ANGLE_COVERAGE]
+                    [--angles-gen-mode ANGLES_GEN_MODE]
+                    [--output-file OUTPUT_FILE]
+
+Generator of 2D projections of 3D Cryo-Em volumes Args that start with &#39;--&#39;
+(eg. --input-file) can also be set in a config file (protein.config or
+specified via --config-file). Config file syntax allows: key=value, flag=true,
+stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
+specified in more than one place, then commandline values override config file
+values which override defaults.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --config-file CONFIG_FILE, -conf CONFIG_FILE
+                        Config file path
+  --input-file INPUT_FILE, -in INPUT_FILE
+                        Input file of 3D volume (*.mrc format)
+  --projections-num PROJECTIONS_NUM, -num PROJECTIONS_NUM
+                        Number of 2D projections. Default 5000
+  --angle-shift ANGLE_SHIFT, -shift ANGLE_SHIFT
+                        Get the start Euler angles that will rotate around
+                        axes Z, Y, Z repsectively. Example usage: -shift 0.0
+                        -shift 0.0 -shift 0.0
+  --angle-coverage ANGLE_COVERAGE, -cov ANGLE_COVERAGE
+                        The range (size of the interval) of the Euler angles
+                        aroung Z, Y, Z axes respectively. Example usage: -cov
+                        0.0 -cov 0.0 -cov 0.0
+  --angles-gen-mode ANGLES_GEN_MODE, -ang-gen ANGLES_GEN_MODE
+                        Specify the mode of generating angles [uniform_S2,
+                        uniform_angles]
+  --output-file OUTPUT_FILE, -out OUTPUT_FILE
+                        Name of output file containing projections with angles
+                        (with the extension)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ROOT_DIR</span> <span class="o">=</span> <span class="s2">&quot;../..&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">numba</span> <span class="k">import</span> <span class="n">cuda</span>
+<span class="n">cuda</span><span class="o">.</span><span class="n">select_device</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">cuda</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>   
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ROOT_DIR</span><span class="p">)</span> 
+<span class="kn">from</span> <span class="nn">cryoem.projections</span> <span class="k">import</span> <span class="n">RotationMatrix</span>
+<span class="kn">from</span> <span class="nn">cryoem.conversions</span> <span class="k">import</span> <span class="n">euler2quaternion</span>
+<span class="kn">from</span> <span class="nn">cryoem.plots</span> <span class="k">import</span> <span class="n">plot_detector_pixels_with_protein</span><span class="p">,</span> <span class="n">plot_images</span><span class="p">,</span> <span class="n">plot_rays</span><span class="p">,</span> <span class="n">plot_angles_histogram</span><span class="p">,</span> <span class="n">plot_quaternions_histogram</span><span class="p">,</span> <span class="n">plot_rotvec</span><span class="p">,</span> <span class="n">plot_polar_plot</span><span class="p">,</span> <span class="n">plot_projection</span><span class="p">,</span> <span class="n">plot_projections</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="stderr docutils container">
+<pre class="stderr literal-block">Warning: To use the exr data format, please install the OpenEXR package following the instructions detailed in the README at github.com/tensorflow/graphics.
+Warning: To use the threejs_vizualization, please install the colabtools package following the instructions detailed in the README at github.com/tensorflow/graphics.
+</pre>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.python.client</span> <span class="k">import</span> <span class="n">device_lib</span> 
+<span class="nb">print</span><span class="p">(</span><span class="n">device_lib</span><span class="o">.</span><span class="n">list_local_devices</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>[name: &quot;/device:CPU:0&quot;
+device_type: &quot;CPU&quot;
+memory_limit: 268435456
+locality {
+}
+incarnation: 9104503805025304740
+, name: &quot;/device:XLA_CPU:0&quot;
+device_type: &quot;XLA_CPU&quot;
+memory_limit: 17179869184
+locality {
+}
+incarnation: 4465913311596276633
+physical_device_desc: &quot;device: XLA_CPU device&quot;
+, name: &quot;/device:XLA_GPU:0&quot;
+device_type: &quot;XLA_GPU&quot;
+memory_limit: 17179869184
+locality {
+}
+incarnation: 7489435168140536522
+physical_device_desc: &quot;device: XLA_GPU device&quot;
+, name: &quot;/device:GPU:0&quot;
+device_type: &quot;GPU&quot;
+memory_limit: 3288465408
+locality {
+  bus_id: 1
+  links {
+  }
+}
+incarnation: 15616205407199807074
+physical_device_desc: &quot;device: 0, name: GeForce GTX 1050 Ti with Max-Q Design, pci bus id: 0000:01:00.0, compute capability: 6.1&quot;
+]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="full-sphere-coverage-uniform-on-mathbb-s-2-5k-projections">
+<h2>Full-Sphere Coverage - Uniform on <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span> - 5K Projections<a class="headerlink" href="#full-sphere-coverage-uniform-on-mathbb-s-2-5k-projections" title="Permalink to this headline">¶</a></h2>
+<p>Generating the 5000 projection images that were taken from angles covering the full sphere around the protein. The sampling on the sphere is done uniformly on <span class="math notranslate nohighlight">\(\mathbb{S}^2\)</span>.</p>
+<p>To generate simulation data of the protein, you can run the following command.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">generator</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="nb">input</span><span class="o">-</span><span class="n">file</span> <span class="n">data</span><span class="o">/</span><span class="mi">5</span><span class="n">j0n</span><span class="o">.</span><span class="n">mrc</span> <span class="o">-</span><span class="n">ang</span><span class="o">-</span><span class="n">gen</span> <span class="n">uniform_angles</span> <span class="o">-</span><span class="n">num</span> <span class="mi">5000</span> <span class="o">-</span><span class="n">shift</span> <span class="mf">0.0</span> <span class="o">-</span><span class="n">shift</span> <span class="mf">0.0</span> <span class="o">-</span><span class="n">shift</span> <span class="mf">0.0</span> <span class="o">-</span><span class="n">cov</span> <span class="mf">2.0</span> <span class="o">-</span><span class="n">cov</span> <span class="mf">1.0</span> <span class="o">-</span><span class="n">cov</span> <span class="mf">2.0</span>
+</pre></div>
+</div>
+<p>Note that the alternative way is just to change the config file <code class="docutils literal notranslate"><span class="pre">protein.config</span></code> with the modifications that you need. In that case it is sufficient to only run the following command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">generator</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">conf</span> <span class="n">protein</span><span class="o">.</span><span class="n">config</span>
+</pre></div>
+</div>
+<p>For every projection, we will have 3 angles, each representing the rotation around the corresponding axis. In our case we are dealing with <span class="math notranslate nohighlight">\(Z-Y-Z\)</span> rotations:</p>
+<ul class="simple">
+<li><p>Z in <span class="math notranslate nohighlight">\([0, 2\pi]\)</span></p></li>
+<li><p>Y in <span class="math notranslate nohighlight">\([0, \pi]\)</span></p></li>
+<li><p>Z in <span class="math notranslate nohighlight">\([0, 2\pi]\)</span></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!python ../../generator.py --input-file ../../data/5j0n.mrc --output-file ../../data/5j0n_full_uniformS2.h5 -ang-gen uniform_S2 -num 5000 -shift 0.0 -shift 0.0 -shift 0.0 -cov 2.0 -cov 1.0 -cov 2.0
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>Warning: To use the exr data format, please install the OpenEXR package following the instructions detailed in the README at github.com/tensorflow/graphics.
+Warning: To use the threejs_vizualization, please install the colabtools package following the instructions detailed in the README at github.com/tensorflow/graphics.
+----------
+Command Line Args:   --input-file ../../data/5j0n.mrc --output-file ../../data/5j0n_full_uniformS2.h5 -ang-gen uniform_S2 -num 5000 -shift 0.0 -shift 0.0 -shift 0.0 -cov 2.0 -cov 1.0 -cov 2.0
+
+----------
+* Loading the dataset *
+Protein:         5j0n
+Input filename:  ../../data/5j0n.mrc
+Output filename: ../../data/5j0n_full_uniformS2.h5
+Projections (#): (5000, 116, 116)
+Angles (#):      (5000, 3)
+
+**********
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># half coverage (AngCoverage=0.5)</span>
+<span class="n">projections_filename</span> <span class="o">=</span> <span class="s2">&quot;../../data/5j0n_full_uniformS2.h5&quot;</span>
+
+<span class="c1"># load structures</span>
+<span class="n">data_full_5k_uniform</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">projections_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">angles2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_full_5k_uniform</span><span class="p">[</span><span class="s1">&#39;Angles&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">projections2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data_full_5k_uniform</span><span class="p">[</span><span class="s1">&#39;Projections&#39;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{angles2.shape[0]}</span><span class="s2"> projections of images with dimension </span><span class="si">{projections2.shape[1:]}</span><span class="s2"> pixels&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{angles2.shape[0]}</span><span class="s2"> sets of </span><span class="si">{angles2.shape[1]}</span><span class="s2"> ground truth angles of corresponding projection images&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-none notranslate"><div class="highlight"><pre><span></span>5000 projections of images with dimension (116, 116) pixels
+5000 sets of 3 ground truth angles of corresponding projection images
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_angles_histogram</span><span class="p">([</span><span class="n">angles2</span><span class="p">],</span> <span class="n">plot_settings</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/2-generate-projections-and-angles_12_0.png" src="../../_images/2-generate-projections-and-angles_12_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_quaternions_histogram</span><span class="p">([</span><span class="n">euler2quaternion</span><span class="p">(</span><span class="n">angles2</span><span class="p">)])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/2-generate-projections-and-angles_13_0.png" src="../../_images/2-generate-projections-and-angles_13_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># pid = 0</span>
+<span class="c1"># plot_projection(projections2[pid], f&#39;Projection {pid}\nAngles {angles2[pid]}&#39;)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pids</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plot_projections</span><span class="p">(</span><span class="n">projections2</span><span class="p">[</span><span class="n">pids</span><span class="p">],</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;Projection </span><span class="si">{pid}</span><span class="se">\n</span><span class="s1">Angles {list(map(lambda x: round(x,2) , angles1[pid]))}&#39;</span> <span class="k">for</span> <span class="n">pid</span> <span class="ow">in</span> <span class="n">pids</span><span class="p">],</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../../_images/2-generate-projections-and-angles_15_0.png" src="../../_images/2-generate-projections-and-angles_15_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_detector_pixels_with_protein</span><span class="p">(</span><span class="n">angles2</span><span class="p">,</span> <span class="s2">&quot;../../data/5j0n.mrc&quot;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="p">[</span><span class="mf">34.88</span><span class="p">,</span> <span class="mf">31.55</span><span class="p">,</span> <span class="mf">39.82</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "0291955ebc3a40329ea5e29f052e37c5", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_images</span><span class="p">(</span><span class="n">angles2</span><span class="p">,</span> <span class="n">projections2</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">),</span> <span class="n">img_size_scale</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "3ba5232096864c9085ee8560cb7a6be6", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot_rays</span><span class="p">(</span><span class="n">angles2</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "dd8db3945ca446298701ec5d084a1132", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./notebooks1/phase-0"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        </div>
+    </div>
+    
+    
+    <div class='prev-next-bottom'>
+        
+    <a class='left-prev' id="prev-link" href="1-chimera.html" title="previous page">Using Chimera to Create CryoEM Data</a>
+    <a class='right-next' id="next-link" href="3-coverage-comparisons.html" title="next page">Compare Different Coverage Distributions</a>
+
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Jelena Banjac<br/>
+        
+            &copy; Copyright 2020.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+
+    <script src="../../_static/js/index.js"></script>
+    
+  </body>
+</html>
