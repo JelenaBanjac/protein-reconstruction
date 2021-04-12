@@ -9,6 +9,7 @@ A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that 
 
 ## Two-Step Method
 Our method consists of two steps.  First, we estimate distances between pairs of projections.  Second, werecover the orientation of each projection from these distances.
+
 ![images/protein_flow.png](images/schematic_method_overview-1.jpg)
 
 
