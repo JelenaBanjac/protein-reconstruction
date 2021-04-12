@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>Protein 3D Poses Recovery &#8212; Protein 3D Poses Recovery</title>
+    <title>Learning to Recover Orientations from Projections in Single-Particle Cryo-EM &#8212; Protein 3D Poses Recovery</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" integrity="sha384-KA6wR/X5RY4zFAHpv/CnoG2UW1uogYfdnP67Uv7eULvTveboZJg0qUpmJZb5VqzN" crossorigin="anonymous">
     <link href="_static/css/index.css" rel="stylesheet">
     <link rel="stylesheet" href="_static/sphinx-book-theme.css" type="text/css" />
@@ -186,13 +186,8 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#general-flow">
-   General Flow
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#team">
-   Team
+  <a class="reference internal nav-link" href="#two-step-method">
+   Two-Step Method
   </a>
  </li>
 </ul>
@@ -205,29 +200,19 @@
         
               <div>
                 
-  <div class="section" id="protein-3d-poses-recovery">
-<h1>Protein 3D Poses Recovery<a class="headerlink" href="#protein-3d-poses-recovery" title="Permalink to this headline">¶</a></h1>
-<p><strong>3D Poses Recovery in Single-Particle Cryo-EM from Learned Pairwise Projection Distances</strong></p>
-<p>The topic of this project is to learn pairwise projection distances in order to recover the angles at which we imaged these 2D projections from a given 3D protein.</p>
-<div class="section" id="summary">
-<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
-<p>Single-particle cryo-electron microscopy (cryo-EM) is a technology that allows the observation and the high-resolution 3D structure determination of biomolecules. In this project, the goal is to estimate the angles at which we imaged the 2D projections from a given 3D protein (cf illustration bellow). We developed deep learning models to estimate the angles from learned pairwise projection distances. We designed a two-step method: 1) <strong>distance estimation</strong> using a Siamese neural network to learn the distance between pairs of projections, and 2) <strong>orientation recovery</strong> that includes a minimization scheme in order to estimate the angles at which each projection was taken. The current results obtained are discussed depending on different combination of approaches used andexperimental conditions.
-<img alt="images/spcryoem.png" src="_images/spcryoem.png" /></p>
-</div>
-<div class="section" id="general-flow">
-<h2>General Flow<a class="headerlink" href="#general-flow" title="Permalink to this headline">¶</a></h2>
-<p>General flow of the project can be seen in the illustration bellow:
-<img alt="images/protein_flow.png" src="_images/protein_flow.png" /></p>
-</div>
-<div class="section" id="team">
-<h2>Team<a class="headerlink" href="#team" title="Permalink to this headline">¶</a></h2>
-<p><strong>Student:</strong><br />
-<a class="reference external" href="https://jelenabanjac.com">Jelena Banjac</a>, jelena.banjac&#64;epfl.ch, Data Science Master Student</p>
-<p><strong>Supervisors:</strong><br />
+  <div class="section" id="learning-to-recover-orientations-from-projections-in-single-particle-cryo-em">
+<h1>Learning to Recover Orientations from Projections in Single-Particle Cryo-EM<a class="headerlink" href="#learning-to-recover-orientations-from-projections-in-single-particle-cryo-em" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://jelenabanjac.com">Jelena Banjac</a>, jelena.banjac&#64;epfl.ch, Data Science Master Student<br />
 <a class="reference external" href="https://people.epfl.ch/laurene.donati?lang=en">Laurène Donati</a>, laurene.donati&#64;epfl.ch, BIG, EPFL<br />
 <a class="reference external" href="https://deff.ch/">Michaël Defferrard</a>, michael.defferrard&#64;epfl.ch, LTS2, EPFL</p>
-<p><strong>Professor:</strong><br />
-<a class="reference external" href="http://bigwww.epfl.ch/unser/">Michaël Unser</a>, michael.unser&#64;epfl.ch, BIG, EPFL</p>
+<div class="section" id="summary">
+<h2>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h2>
+<p>A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that the orientationsadopted by the 3D particles prior to imaging are unknown;  yet, this knowledge is essential forhigh-resolution reconstruction. We present a method to recover these orientations directly from theacquired set of 2D projections. Our approach consists of two steps: (i) the estimation of distancesbetween pairs of projections, and (ii) the recovery of the orientation of each projection from thesedistances.  In step (i), pairwise distances are estimated by a Siamese neural network trained onsynthetic cryo-EM projections from resolved bio-structures. In step (ii), orientations are recovered byminimizing the difference between the distances estimated from the projections and the distancesinduced by the recovered orientations.  We evaluated the method on synthetic cryo-EM datasets.Current results demonstrate that orientations can be accurately recovered from projections that areshifted and corrupted with a high level of noise.  The accuracy of the recovery depends on theaccuracy of the distance estimator. While not yet deployed in a real experimental setup, the proposedmethod offers a novel learning-based take on orientation recovery in SPA and may bring interestingnew perspectives in the field.  Our code is available at https://github.com/JelenaBanjac/protein-reconstruction.</p>
+</div>
+<div class="section" id="two-step-method">
+<h2>Two-Step Method<a class="headerlink" href="#two-step-method" title="Permalink to this headline">¶</a></h2>
+<p>Our method consists of two steps.  First, we estimate distances between pairs of projections.  Second, werecover the orientation of each projection from these distances.
+<img alt="images/protein_flow.png" src="_images/schematic_method_overview-1.jpg" /></p>
 <div class="toctree-wrapper compound">
 </div>
 </div>
