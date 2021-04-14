@@ -1,21 +1,23 @@
-# Learning to Recover Orientations from Projections in Single-Particle Cryo-EM
- 
-[Jelena Banjac](https://jelenabanjac.com), jelena.banjac@epfl.ch, Data Science Master Student  
-[Laurène Donati](https://people.epfl.ch/laurene.donati?lang=en), laurene.donati@epfl.ch, BIG, EPFL  
-[Michaël Defferrard](https://deff.ch/), michael.defferrard@epfl.ch, LTS2, EPFL  
+# Learning to recover orientations from projections in single-particle cryo-EM
 
+[Jelena Banjac](https://jelenabanjac.com), Data Science master student,
+[Laurène Donati](https://people.epfl.ch/laurene.donati), BIG,
+[Michaël Defferrard](https://deff.ch/), LTS2, EPFL.
 
-## Summary
-A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that the orientationsadopted by the 3D particles prior to imaging are unknown;  yet, this knowledge is essential forhigh-resolution reconstruction. We present a method to recover these orientations directly from theacquired set of 2D projections. Our approach consists of two steps: (i) the estimation of distancesbetween pairs of projections, and (ii) the recovery of the orientation of each projection from thesedistances.  In step (i), pairwise distances are estimated by a Siamese neural network trained onsynthetic cryo-EM projections from resolved bio-structures. In step (ii), orientations are recovered byminimizing the difference between the distances estimated from the projections and the distancesinduced by the recovered orientations.  We evaluated the method on synthetic cryo-EM datasets.Current results demonstrate that orientations can be accurately recovered from projections that areshifted and corrupted with a high level of noise.  The accuracy of the recovery depends on theaccuracy of the distance estimator. While not yet deployed in a real experimental setup, the proposedmethod offers a novel learning-based take on orientation recovery in SPA and may bring interestingnew perspectives in the field.  Our code is available at [this url](https://github.com/JelenaBanjac/protein-reconstruction).
+* Paper: [`arXiv:2104.06237`](https://arxiv.org/abs/2104.06237)
+* Website with interactive visualizations: <https://jelenabanjac.com/protein-reconstruction/home.html>
 
-## Two-Step Method
-Our method consists of two steps.  First, we estimate distances between pairs of projections.  Second, werecover the orientation of each projection from these distances.
+> A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that the orientations adopted by the 3D particles prior to imaging are unknown; yet, this knowledge is essential for high-resolution reconstruction.
+> We present a method to recover these orientations directly from the acquired set of 2D projections.
+> Our approach consists of two steps: (i) the estimation of distances between pairs of projections, and (ii) the recovery of the orientation of each projection from these distances.
+> In step (i), pairwise distances are estimated by a Siamese neural network trained on synthetic cryo-EM projections from resolved bio-structures.
+> In step (ii), orientations are recovered by minimizing the difference between the distances estimated from the projections and the distances induced by the recovered orientations.
+> We evaluated the method on synthetic cryo-EM datasets.
+> Current results demonstrate that orientations can be accurately recovered from projections that are shifted and corrupted with a high level of noise.
+> The accuracy of the recovery depends on the accuracy of the distance estimator.
+> While not yet deployed in a real experimental setup, the proposed method offers a novel learning-based take on orientation recovery in SPA.
 
-![images/protein_flow.png](images/schematic_method_overview-1.jpg)
-
-## Documents
-
-More details on the implementation can be found on the [arXiv](https://arxiv.org/abs/2104.06237) 
+![two-step method](images/schematic_method_overview-1.jpg)
 
 ## Repository
 This repository contains a python package called `cryoem` that contains scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes. perform distance estimation and orientation recovery, and reconstruct the 3D protein using estimated orientations. 
