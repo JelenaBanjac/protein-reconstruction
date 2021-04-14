@@ -19,18 +19,21 @@
 
 ![two-step method](images/schematic_method_overview-1.jpg)
 
-## Repository
-This repository contains a python package called `cryoem` that contains scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes. perform distance estimation and orientation recovery, and reconstruct the 3D protein using estimated orientations. 
-It also contains the notebooks with different combinations of project approaches.
+## Repository content
 
-### Notebooks
-Notebooks are divided in several phases of development:
-- [Phase 0](https://jelenabanjac.com/protein-reconstruction/phase0_intro.html): generate 2D projections from 3D protein
-- [Phase 1](https://jelenabanjac.com/protein-reconstruction/phase1_intro.html): distance function between two 2D projections
-- [Phase 2](https://jelenabanjac.com/protein-reconstruction/phase2_intro.html): orientation recovery
-- [Phase 3](https://jelenabanjac.com/protein-reconstruction/phase3_intro.html): reconstruction of 3D protein structure from 2D projection images and estimated angles
+[Notebooks](./notebooks), used to reproduce our findings, are divided in the following phases:
+
+0. [Data preparation](https://jelenabanjac.com/protein-reconstruction/phase0_intro.html): generate 2D projections from a protein
+1. [Distance estimation](https://jelenabanjac.com/protein-reconstruction/phase1_intro.html): learn a function to estimate the distance between two projections
+2. [Orientation recovery](https://jelenabanjac.com/protein-reconstruction/phase2_intro.html): recover the projections' orientations from estimated distances
+3. [Protein reconstruction](https://jelenabanjac.com/protein-reconstruction/phase3_intro.html): reconstruct the protein from its projections and their recovered orientations
+
+The notebooks in each folder represent different experimental conditions or modeling approach.
+
+Additionally, the [`cryoem`](./cryoem) python package contains scripts to generate a huge amount of 2D projections with corresponding orientation.
 
 ## Installation
+
 First, download and install Anaconda or Miniconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
 
 Then open the terminal and type following:
