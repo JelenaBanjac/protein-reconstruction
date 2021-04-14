@@ -88,14 +88,17 @@ $ nvcc --version
 $ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 ```
 
-## Licence & arXiv
+## Licence & citation
+
 The code in this repository is released under the terms of the [MIT license](LICENSE).
-Please cite our [document](https://arxiv.org/pdf/2104.06237.pdf) if you use it.
+Please cite our paper if you use it.
 
 ```
-@inproceedings{orientation_recovery_cryoem,
+@inproceedings{cryoem_orientation_recovery,
   title = {Learning to recover orientations from projections in single-particle cryo-EM},
   author = {Banjac, Jelena, Donati, Laur\`ene, and Defferrard, Micha\"el},
   year = {2021},
-  url = {https://arxiv.org/abs/1606.09375},
+  archivePrefix={arXiv},
+  eprint={2104.06237},
+  url = {https://arxiv.org/abs/2104.06237},
 }
