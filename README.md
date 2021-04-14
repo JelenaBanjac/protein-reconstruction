@@ -1,25 +1,35 @@
-# 3D Poses Recovery in Single-Particle Cryo-EM from Learned Pairwise Projection Distances
+# Learning to Recover Orientations from Projections in Single-Particle Cryo-EM
+ 
+[Jelena Banjac](https://jelenabanjac.com), jelena.banjac@epfl.ch, Data Science Master Student  
+[Laurène Donati](https://people.epfl.ch/laurene.donati?lang=en), laurene.donati@epfl.ch, BIG, EPFL  
+[Michaël Defferrard](https://deff.ch/), michael.defferrard@epfl.ch, LTS2, EPFL  
 
-The topic of this project is to learn pairwise projection distances in order to recover the angles at which we imaged these 2D projections from a given 3D protein.
 
 ## Summary
-Single-particle cryo-electron microscopy (cryo-EM) is a technology that allows the observation and the high-resolution 3D structure determination of biomolecules. In this project, the goal is to estimate the angles at which we imaged the 2D projections from a given 3D protein (cf illustration bellow). We developed deep learning models to estimate the angles from learned pairwise projection distances. We designed a two-step method: 1) **distance estimation** using a Siamese neural network to learn the distance between pairs of projections, and 2) **angle recovery** that includes a minimization scheme in order to estimate the angles at which each projection was taken. The current results obtained are discussed depending on different combination of approaches used andexperimental conditions.
-![images/spcryoem.png](images/spcryoem.png)
+A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that the orientationsadopted by the 3D particles prior to imaging are unknown;  yet, this knowledge is essential forhigh-resolution reconstruction. We present a method to recover these orientations directly from theacquired set of 2D projections. Our approach consists of two steps: (i) the estimation of distancesbetween pairs of projections, and (ii) the recovery of the orientation of each projection from thesedistances.  In step (i), pairwise distances are estimated by a Siamese neural network trained onsynthetic cryo-EM projections from resolved bio-structures. In step (ii), orientations are recovered byminimizing the difference between the distances estimated from the projections and the distancesinduced by the recovered orientations.  We evaluated the method on synthetic cryo-EM datasets.Current results demonstrate that orientations can be accurately recovered from projections that areshifted and corrupted with a high level of noise.  The accuracy of the recovery depends on theaccuracy of the distance estimator. While not yet deployed in a real experimental setup, the proposedmethod offers a novel learning-based take on orientation recovery in SPA and may bring interestingnew perspectives in the field.  Our code is available at [this url](https://github.com/JelenaBanjac/protein-reconstruction).
 
-## General Flow
-General flow of the project can be seen in the illustration bellow:
-![images/protein_flow.png](images/protein_flow.png)
+## Two-Step Method
+Our method consists of two steps.  First, we estimate distances between pairs of projections.  Second, werecover the orientation of each projection from these distances.
 
-## Report
-More details on the implementation can be found in the [report](reports/Report_BIGSemesterProject_JelenaBanjac.pdf).  
-The presentation slideshow can be found on this [link](https://docs.google.com/presentation/d/e/2PACX-1vSeN_Zd4mL9ScdvlEAIib4QFq3kkUxojnj-YBEAGuxKxPDQ48PCL2Y_JBT4cn_UBcIFhPp_YnNZZF1c/pub?start=true&loop=false&delayms=3000) and the presentation material on this [link](reports/Presentation_BIGSemesterProject_JelenaBanjac.pdf).
+![images/protein_flow.png](images/schematic_method_overview-1.jpg)
+
+## Documents
+
+More details on the implementation can be found on the [arXiv](https://arxiv.org/abs/2104.06237) 
 
 ## Repository
-This repository contains scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes. 
-Also, it contains the notebooks with different combinations of project approaches.
+This repository contains a python package called `cryoem` that contains scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes. perform distance estimation and orientation recovery, and reconstruct the 3D protein using estimated orientations. 
+It also contains the notebooks with different combinations of project approaches.
+
+### Notebooks
+Notebooks are divided in several phases of development:
+- [Phase 0](notebooks/0-preparation): prepare simulated data, generate 3D protein's set of 2D projection images and their corresponding angles,
+- [Phase 1](notebooks/1-phase1): angle recovery using the perfect distances,
+- [Phase 2](notebooks/2-phase2): distance estimation and angle recovery,
+- [Phase 3](notebooks/3-reconstruction): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2).
 
 ## Installation
-First, download and install Anaconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
+First, download and install Anaconda or Miniconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
 
 Then open the terminal and type following:
 ```bash
@@ -49,52 +59,7 @@ pip3 install tensorflow-graphics
 python3 -c "import astra;astra.test_CUDA()"
 ```
 
-## Run
-
-```bash
-usage: generator.py [-h] --config-file CONFIG_FILE [--input-file INPUT_FILE]
-                    [--projections-num PROJECTIONS_NUM]
-                    [--angle-shift ANGLE_SHIFT]
-                    [--angle-coverage ANGLE_COVERAGE]
-                    [--output-file OUTPUT_FILE]
-
-Generator of 2D projections of 3D Cryo-Em volumes Args that start with '--'
-(eg. --input-file) can also be set in a config file (protein.config or
-specified via --config-file). Config file syntax allows: key=value, flag=true,
-stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
-specified in more than one place, then commandline values override config file
-values which override defaults.
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --config-file CONFIG_FILE, -conf CONFIG_FILE
-                        Config file path
-  --input-file INPUT_FILE, -in INPUT_FILE
-                        Input file of 3D volume (*.mrc format)
-  --projections-num PROJECTIONS_NUM, -num PROJECTIONS_NUM
-                        Number of 2D projections. Default 5000
-  --angle-shift ANGLE_SHIFT, -shift ANGLE_SHIFT
-                        Get the start Euler angles that will rotate around
-                        axes Z, Y, Z repsectively
-  --angle-coverage ANGLE_COVERAGE, -cov ANGLE_COVERAGE
-                        The range (size of the interval) of the Euler angles
-                        aroung Z, Y, Z axes respectively
-  --output-file OUTPUT_FILE, -out OUTPUT_FILE
-                        Name of output file containing projections with angles
-                        (with the extension)
-
-```
-
-Main use is:
-```bash
-# read the settings from config file
-python generator.py -config protein.config
-
-# almost half sphere (overrides config default values)
-python generator.py -conf protein.config --input-file data/5j0n.mrc -num 5000 -shift 0.0 -shift 0.0 -shift 0.0 -cov 2.0 -cov 0.4 -cov 2.0
-```
-
-Run the jupyter notebook:
+To run the jupyter notebooks (`$1` is GPU id, `$2` is port for jupyter notebook if ran externally):
 
 ```bash
 cd $HOME/protein-reconstruction/notebooks
@@ -103,9 +68,9 @@ export CUDA_VISIBLE_DEVICES=$1
 nohup $HOME/miniconda/envs/protein_reconstruction/bin/jupyter notebook --ip=0.0.0.0 --port=$2 &
 ```
 
-## Misc information
+For more information how to do use the pachage methods, checkout the [website](https://jelenabanjac.com/protein-reconstruction/home.html) with the example.
 
-### Package versions
+## Package versions
 The following versions of the packages are used in the project.
 ```
 python-3.6.8
@@ -123,31 +88,14 @@ $ nvcc --version
 $ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
 ```
 
-## Logbook
-Notes taken during the project development:
-- [Experiments notes](https://app.box.com/s/8heyh18d473xetiqzu1eorkzk29ax40e)
-- [Meeting notes](https://app.box.com/s/0x42ke3j5e6yyoomlhukcayf4qz3ezgw)
-- [Summary notes of work left to be done after first 4 months](https://app.box.com/s/ndgnxrgompchlhr7o2hoqaalacjp98hd)
+## Licence & arXiv
+The code in this repository is released under the terms of the [MIT license](LICENSE).
+Please cite our [document](https://arxiv.org/pdf/2104.06237.pdf) if you use it.
 
-## Notebooks
-Notebooks are divided in several phases of development:
-- [Phase 0](notebooks/0-preparation): prepare simulated data, generate 3D protein's set of 2D projection images and their corresponding angles
-- [Phase 1](notebooks/1-phase1): angle recovery using the perfect distances
-- [Phase 2](notebooks/2-phase2): distance estimation and angle recovery
-- [Phase 3](notebooks/3-reconstruction): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2) 
-
-### Colab Notebooks
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov-polynomialAR.ipynb) Polynomial Angle Recovery with Already Estimated Distances
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov_noisy.ipynb) Distance Estimation with Noisy Dataset
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/JelenaBanjac/protein-reconstruction/blob/master/notebooks/2-phase2/colab_distance_estimation_and_angle_recovery-test5j0nhalf-cov_cosine.ipynb) Distance Estimation with Cosine Distance
-## Team
-**Student:**  
-[Jelena Banjac](https://jelenabanjac.com), jelena.banjac@epfl.ch, Data Science Master Student
-
-**Supervisors:**  
-[Laurène Donati](https://people.epfl.ch/laurene.donati?lang=en), laurene.donati@epfl.ch, BIG, EPFL  
-[Michaël Defferrard](https://deff.ch/), michael.defferrard@epfl.ch, LTS2, EPFL
-
-**Professor:**  
-[Michaël Unser](http://bigwww.epfl.ch/unser/), michael.unser@epfl.ch, BIG, EPFL
-
+```
+@inproceedings{orientation_recovery_cryoem,
+  title = {Learning to recover orientations from projections in single-particle cryo-EM},
+  author = {Banjac, Jelena, Donati, Laur\`ene, and Defferrard, Micha\"el},
+  year = {2021},
+  url = {https://arxiv.org/abs/1606.09375},
+}
