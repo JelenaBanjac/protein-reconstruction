@@ -34,46 +34,29 @@ Additionally, the [`cryoem`](./cryoem) python package contains scripts to genera
 
 ## Installation
 
-First, download and install Anaconda or Miniconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
-
-Then open the terminal and type following:
+Install the software dependencies:
 ```bash
-# clone the repo
+# clone the repository
 git clone https://github.com/JelenaBanjac/protein-reconstruction.git
-
-# position yourself inside the project
 cd protein-reconstruction
 
-# create environment
+# create and activate the environment
 conda env create -f environment.yml
-
-# activate environment
 conda activate protein_reconstruction
 ```
-Now you are able to use the code and run the notebooks you wish!
 
-[Optional] Test if some dependencies are installed:
+Optionally, test if some dependencies are properly installed:
 ```bash
-# tensorflow check
 python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
-# o/w install with: 
-pip3 install tensorflow-gpu
-pip3 install tensorflow-graphics
-
-# astra toolbox check
-python3 -c "import astra;astra.test_CUDA()"
+python3 -c "import astra; astra.test_CUDA()"
 ```
 
-To run the jupyter notebooks (`$1` is GPU id, `$2` is port for jupyter notebook if ran externally):
-
+Run the jupyter notebooks (`$1` is GPU id, `$2` is the port where jupyter is served if ran externally):
 ```bash
-cd $HOME/protein-reconstruction/notebooks
-source activate protein_reconstruction
+cd notebooks
 export CUDA_VISIBLE_DEVICES=$1
-nohup $HOME/miniconda/envs/protein_reconstruction/bin/jupyter notebook --ip=0.0.0.0 --port=$2 &
+nohup jupyter notebook --ip=0.0.0.0 --port=$2 &
 ```
-
-For more information how to do use the pachage methods, checkout the [website](https://jelenabanjac.com/protein-reconstruction/home.html) with the example.
 
 ## Package versions
 The following versions of the packages are used in the project.
