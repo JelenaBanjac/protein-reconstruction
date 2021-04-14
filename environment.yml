@@ -183,5 +183,3 @@ dependencies:
     - werkzeug==0.16.0
     - wrapt
 #    - mayavi==4.7.1
-prefix: /home/jbanjac/anaconda3/envs/protein_reconstruction
-
