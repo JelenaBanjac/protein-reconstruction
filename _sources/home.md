@@ -15,7 +15,7 @@ Our method consists of two steps.  First, we estimate distances between pairs of
 
 ## Documents
 
-More details on the implementation can be found on the [arXiv](https://arxiv.org/abs/2104.06237) 
+More details on the implementation can be found on the [arXiv](https://arxiv.org/abs/2104.06237). 
 
 ## Repository
 This repository contains a python package called `cryoem` that contains scripts to generate a huge amount of 2D projections with corresponding angles of 3D volumes. perform distance estimation and orientation recovery, and reconstruct the 3D protein using estimated orientations. 
@@ -23,10 +23,10 @@ It also contains the notebooks with different combinations of project approaches
 
 ### Notebooks
 Notebooks are divided in several phases of development:
-- [Phase 0](notebooks/0-preparation): prepare simulated data, generate 3D protein's set of 2D projection images and their corresponding angles,
-- [Phase 1](notebooks/1-phase1): angle recovery using the perfect distances,
-- [Phase 2](notebooks/2-phase2): distance estimation and angle recovery,
-- [Phase 3](notebooks/3-reconstruction): reconstruction of 3D protein structure from 2D projection images and estimated angles (from Phase 1 or Phase 2).
+- [Phase 0](https://jelenabanjac.com/protein-reconstruction/phase0_intro.html): generate 2D projections from 3D protein
+- [Phase 1](https://jelenabanjac.com/protein-reconstruction/phase1_intro.html): distance function between two 2D projections
+- [Phase 2](https://jelenabanjac.com/protein-reconstruction/phase2_intro.html): orientation recovery
+- [Phase 3](https://jelenabanjac.com/protein-reconstruction/phase3_intro.html): reconstruction of 3D protein structure from 2D projection images and estimated angles
 
 ## Installation
 First, download and install Anaconda or Miniconda on your machine, link [here](https://www.anaconda.com/products/individual). Note: the project was developed with Python 3.6+.
