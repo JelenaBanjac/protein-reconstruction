@@ -1,0 +1,36 @@
+# For more config settings, look at: https://jupyterbook.org/customize/config.html#source-repository-button
+# Book settings, in the left sidebar
+title: Protein 3D Poses Recovery
+author: Jelena Banjac
+logo: images/logo.gif
+copyright: "2021"
+# Auto-exclude files not in the toc
+#only_build_toc_files        : false
+
+# Don't execute notebooks, by default it executes (check, maybe enable later?)
+execute:
+  execute_notebooks: "off"
+
+# button to repository
+repository:
+  url: https://github.com/JelenaBanjac/protein-reconstruction/
+
+# HTML-specific settings
+html:
+  favicon                   : "images/logo.gif"  # A path to a favicon image
+  use_edit_page_button      : false  # Whether to add an "edit this page" button to pages. If `true`, repository information in repository: must be filled in
+  use_repository_button     : true  # Whether to add a link to your repository button
+  use_issues_button         : true  # Whether to add an "open an issue" button
+  use_binder_button         : true  # Whether to add an "open an issue" button
+  extra_navbar              : ""  # Will be displayed underneath the left navbar.
+  extra_footer              : ""  # Will be displayed underneath the footer.
+  google_analytics_id       : ""  # A GA id that can be used to track book views.
+  home_page_in_navbar       : false  # Whether to include your home page in the left Navigation Bar
+  baseurl                   : "https://jelenabanjac.com/protein-reconstruction/index.html"  # The base URL where your book will be hosted. Used for creating image previews and social links. e.g.: https://mypage.com/mybook/
+  comments:
+    hypothesis              : true
+    utterances              : false
+
+# latex:
+#   latex_documents:
+#     targetname: book.tex

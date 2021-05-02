@@ -1,46 +1,7 @@
-
-#import tensorflow_probability as tfp
-import os
-import h5py
-from time import time, strftime
-from datetime import datetime
-import matplotlib.pyplot as plt
-import numpy as np
-from sklearn.model_selection import train_test_split
-import pathlib
-
-from cryoem.rotation_matrices import RotationMatrix
-from cryoem.conversions import euler2quaternion, d_q
-from cryoem.knn import get_knn_projections
-
-import random
-import tensorflow as tf
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.models import Model
-from tensorflow.python.keras.applications.mobilenet import MobileNet
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, AvgPool2D, Lambda, ZeroPadding2D, Dropout, Concatenate, Dense, GlobalAveragePooling2D, Flatten
-from tensorflow.keras.optimizers import RMSprop, Adam, SGD
-from tensorflow.keras import backend as K
-from tensorflow.keras.callbacks import ModelCheckpoint,ReduceLROnPlateau
-from tensorflow.keras.callbacks import TensorBoard
-from tensorflow.keras.utils import plot_model, multi_gpu_model
-#from tensorflow.python.keras.applications.resnet50 import ResNet50
-from tensorflow.python.keras.applications.inception_v3 import InceptionV3
-from tensorflow.keras.losses import KLD, MAE, MSE
 from tensorflow.keras.utils import Sequence
-import pandas as pd
-import seaborn as sns
-import io
 
 num_dec = 1
 num_bins = 32
-
-# # for weights
-# dQ_values = np.load("data/5j0n/dQ_values_100K.npy")
-# distribution = np.histogram(dQ_values, bins=32, range=(0.0, np.pi), density=True)
-# probabilities = distribution[0]
-# weights = 1/probabilities
-# weights_norm = weights/sum(weights)
 
 class DataGenerator(Sequence):
     
@@ -117,30 +78,45 @@ class DataGenerator(Sequence):
         pairs = np.stack((self.X[idx1], self.X[idx2]), axis=1)  # shape: (len(idx1), 2, x.shape[1], x.shape[2], x.shape[3])
         labels = d_q(euler2quaternion(self.y[idx1]), euler2quaternion(self.y[idx2]))  # shape: len(idx1)
 
-        #weights = np.array(self._get_weights(labels))
-        #labels_and_weights = np.stack((labels, weights), axis=1)
+        return [pairs[:, 0], pairs[:, 1]], labels 
         
-        # [training_pairs[:, 0], training_pairs[:, 1]], labels
-        return (pairs[:, 0], pairs[:, 1]), labels 
-        
-    #def _get_weights(self, labels):
-    #    l = labels.numpy()
-    #    return np.array(list(map(lambda x: probabilities[np.where(x >= distribution[1])[0][-1]], l)))    
-    
+
     def _on_epoch_start(self):
         # Updates indices after each epoch
         self.indices = np.arange(len(self.pair_ids))
         if self.shuffle:
-            np.random.shuffle(self.indices)
+            np.random.shuffle(self.indices)     
+            
+import os
+import h5py
+from time import time, strftime
+from datetime import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.model_selection import train_test_split
+import pathlib
 
-# _idx1 = list(np.random.choice(val_idx, size=1000))
-# _idx2 = list(np.random.choice(val_idx, size=1000))
+from cryoem.rotation_matrices import RotationMatrix
+from cryoem.conversions import euler2quaternion, d_q
+from cryoem.knn import get_knn_projections
+import pandas as pd
+import random
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Model
+from tensorflow.python.keras.applications.mobilenet import MobileNet
+from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, AvgPool2D, Lambda, ZeroPadding2D, Dropout, Concatenate, Dense, GlobalAveragePooling2D, Flatten
+from tensorflow.keras.optimizers import RMSprop, Adam, SGD
+from tensorflow.keras import backend as K
+from tensorflow.keras.callbacks import ModelCheckpoint,ReduceLROnPlateau
+from tensorflow.keras.callbacks import TensorBoard
+from tensorflow.keras.utils import plot_model#, multi_gpu_model
+from tensorflow.python.keras.applications.inception_v3 import InceptionV3
+from tensorflow.keras.losses import KLD, MAE, MSE
+import pandas as pd
+import seaborn as sns
+import io
 
-# q1_true = euler2quaternion([angles_true[i] for i in _idx1])
-# q2_true = euler2quaternion([angles_true[i] for i in _idx2])
-
-# p1 = [X[i] for i in _idx1]
-# p2 = [X[i] for i in _idx2]
 
 model = None
 
@@ -175,7 +151,6 @@ def create_siamese_network(input_shape):
     #print(input_shape)
 
     # add Convolution, MaxPool, Conv2D, remove Dropout and Dense
-    
     x = Conv2D(filters=32, kernel_size=[7, 7], activation='relu', padding='same', kernel_initializer='glorot_uniform')(input_x)
     x = MaxPooling2D([2, 2], padding='same')(x)
 
@@ -204,9 +179,16 @@ def create_siamese_network(input_shape):
     return Model(input_x, x)
 
 
-def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, limit_style, path_logs_training, training_description="", training_steps=None, validation_steps=None, plot=True, gpus=None, file_name=None):
-    
-    
+def train_siamese(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, limit_style, path_logs_training, training_description="", training_steps=None, validation_steps=None, plot=True, gpus=None):
+    _idx1 = list(np.random.choice(val_idx, size=1000))
+    _idx2 = list(np.random.choice(val_idx, size=1000))
+
+    q1_true = euler2quaternion([angles_true[i] for i in _idx1])
+    q2_true = euler2quaternion([angles_true[i] for i in _idx2])
+
+    p1 = [X[i] for i in _idx1]
+    p2 = [X[i] for i in _idx2]
+
     def d_p(p1, p2):
         global model
         p1 = tf.cast(p1, dtype=tf.float32)
@@ -229,18 +211,10 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
         image = tf.expand_dims(image, 0)
         return image
 
-    def generate_dPdQ_plot(file_writer_plot, val_idx, y, X):
+    def generate_dPdQ_plot(file_writer_plot):
         """Source: https://www.tensorflow.org/tensorboard/image_summaries#logging_arbitrary_image_data"""
 
-        _idx1 = list(np.random.choice(val_idx, size=1000))
-        _idx2 = list(np.random.choice(val_idx, size=1000))
-
-        q1_true = euler2quaternion([y[i] for i in _idx1])
-        q2_true = euler2quaternion([y[i] for i in _idx2])
-
-        p1 = [X[i] for i in _idx1]
-        p2 = [X[i] for i in _idx2]
-
+        
         def _inner_plot(epoch, logs):
             """Generate dP/dQ plot for tensorboard"""
             dP_values = d_p(p1, p2).T[0]
@@ -292,7 +266,7 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
         # train
         #model = multi_gpu_model(m, gpus=gpus)
         model.summary()
-        #plot_model(model, to_file="figures/model_plot.png", expand_nested=True, show_shapes=True, show_layer_names=True)
+        plot_model(model, to_file=f"{path_logs_training}/model_plot_256d.png", expand_nested=True, show_shapes=True, show_layer_names=True)
 
         # training only top layers
         optimizer1 = RMSprop(learning_rate=learning_rate)
@@ -311,10 +285,9 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
         logs_callback = TensorBoard(LOGS_PATH, histogram_freq=1) #, profile_batch=300)#100000000)
         # Callback for the dP/dQ plot
         file_writer_plot = tf.summary.create_file_writer(os.path.join(LOGS_PATH, "image"))
-        plot_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=generate_dPdQ_plot(file_writer_plot, val_idx, y, X))
+        plot_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=generate_dPdQ_plot(file_writer_plot))
         # Callback that will decrease LR if it gets plateau in val_loss
         #reduce_on_plateau_callback = ReduceLROnPlateau(monitor="loss", mode="min", factor=0.1, patience=20, min_lr=1e-4, verbose=1)
-
 
 
         history1 = model.fit(training_generator, 
@@ -328,7 +301,7 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
         mses = history1.history['mse']
         val_mses = history1.history['val_mse']
         pathlib.Path(f"{path_logs_training}/losses").mkdir(parents=True, exist_ok=True)
-        np.savez(f"{path_logs_training}/losses/losses.npz", training_loss, val_loss, mses, val_mses)
+        np.savez(f"{path_logs_training}/losses/{training_description}.npz", training_loss, val_loss, mses, val_mses)
 
         if plot:
             fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15,7))
@@ -348,10 +321,6 @@ def train_distance_estimation(X, y, train_idx, val_idx, epochs, batch_size, lear
             ax2.legend()
             ax2.set_xlabel('Epoch')
             ax2.set_ylabel('Loss')
-            
-            if file_name:
-                plt.savefig(file_name)
-
             plt.show();
 
         return model, history1

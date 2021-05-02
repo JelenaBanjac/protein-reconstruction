@@ -1,0 +1,42 @@
+
+- file: README
+
+# CryoEM code documentation
+# - part: CryoEM documentation
+#   chapters:
+#   - file: content
+
+# Package notebooks
+- part: Notebooks
+  chapters: 
+  - file: phase0_intro.md
+    sections:
+    - file: notebooks/0-data-preparation/1-chimera
+      title: Chimera
+    - file: notebooks/0-data-preparation/2-generate-projections-and-angles
+      title: Data Generation and Exploration
+    - file: notebooks/0-data-preparation/3-coverage-comparisons
+      title: Different Sphere Coverage Comparisons
+  - file: phase1_intro.md
+    sections:
+    - file: notebooks/1-distance-estimation/1-perfect-distance-and-perturbed
+      title: Perfect Distance and Perturbed Distance
+    - file: notebooks/1-distance-estimation/2-euclidean-distance
+      title: Euclidean Distance as a Baseline
+    - file: notebooks/1-distance-estimation/3-learned-distance
+      title: Learned Distance
+  - file: phase2_intro.md
+    sections:
+    - file: notebooks/2-orientation-recovery/1-perfect-distance-and-perturbed
+      title: Orientation Recovery with Perfect Distance
+    - file: notebooks/2-orientation-recovery/2-learned-distance
+      title: Orientation Recovery with Learned Distance
+  - file: phase3_intro
+    sections:
+    - file: notebooks/3-protein-reconstruction/1-reconstruction
+      title: Protein Reconstruction
+
+# - part: Last part
+#   chapters:
+#   - file: content
+#   - file: notebooks

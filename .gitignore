@@ -144,3 +144,5 @@ dmypy.json
 *.html
 *.png
 *.npy
+
+_build

@@ -17,9 +17,11 @@ import astra
 import pathlib
 import h5py
 from cryoem.rotation_matrices import RotationMatrix
+from tensorflow_graphics.geometry.transformation import quaternion
+from cryoem.conversions import quaternion2euler
 
  
-def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra, angles_gen_mode="uniform_angles"):
+def generate_projections_ASTRA(Vol, Angles, ProjSize, BatchSizeAstra):
     """
     angles_gen_mode: str
         Takes values in [`uniform_angles`, `uniform_quaternions`]
@@ -27,40 +29,9 @@ def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra, angles
     # Create 3D geometry in ASTRA
     Vol_geom    = astra.create_vol_geom(Vol.shape[1], Vol.shape[2], Vol.shape[0])
 
-    # Generate random angles
-    if angles_gen_mode == "uniform_angles":
-        Z1 =  AngShift[0]*np.pi + AngCoverage[0]*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-        Y2 =  AngShift[1]*np.pi + AngCoverage[1]*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-        Z3 =  AngShift[2]*np.pi + AngCoverage[2]*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-        angles = np.concatenate((Z1, Y2, Z3), axis=1)
-    elif angles_gen_mode == "uniform_S3":
-        quaternions = quaternion.normalized_random_uniform(quaternion_shape=(BatchSizeAstra,))
-        quaternions = quaternions  #[:BatchSizeAstra]
-        angles = quaternion2euler(quaternions)
-        
-#         indices = np.where((AngShift[0]*np.pi<=angles[:,0]) & (angles[:,0]<=AngCoverage[0]*np.pi) & ((AngShift[1]*np.pi<=angles[:,1]) & (angles[:,1]<=AngCoverage[1]*np.pi) & (AngShift[2]*np.pi<=angles[:,2]) & (angles[:,2]<=AngCoverage[2]*np.pi)))[0]
-#         angles = np.take(angles, indices, axis=0)
-
-#         phi = 2*np.pi*np.random.random(size=(BatchSizeAstra, 1))
-#         cos_theta = 2*np.random.random(size=(BatchSizeAstra, 1))-1
-#         u = np.random.random(size=(BatchSizeAstra, 1))
-#         theta = np.arccos(cos_theta)
-#         r = np.cbrt(u)
-
-#         phi = AngShift[2]*np.pi + AngCoverage[2]**np.pi*np.random.random(size=(BatchSizeAstra, 1))
-#         min_v = min(np.cos(AngShift[1]*np.pi), np.cos(AngShift[1]*np.pi+AngCoverage[1]*np.pi))
-#         max_v = max(np.cos(AngShift[1]*np.pi), np.cos(AngShift[1]*np.pi+AngCoverage[1]*np.pi))
-#         cos_theta = np.random.uniform(low=min_v, high=max_v, size=(BatchSizeAstra, 1))
-#         u = np.random.random(size=(BatchSizeAstra, 1))
-#         theta = np.arccos(cos_theta)
-#         # TODO: left to limit r
-#         r = np.cbrt(u)
-#         angles = np.concatenate((r, theta, phi), axis=1)
-    else:
-        raise NotImplemented("Please specify angles_gen_mode parameter that represents how angles will be generated")
     
     # Generate orientation vectors based on angles
-    Orientation_Vectors   = RotationMatrix(angles)
+    Orientation_Vectors   = RotationMatrix(Angles)
 
     # Create projection 2D geometry in ASTRA
     Proj_geom = astra.create_proj_geom('parallel3d_vec', ProjSize, ProjSize, Orientation_Vectors)
@@ -71,10 +42,10 @@ def gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra, angles
     # Reshape projections correctly 
     Projections = np.transpose(Proj_data, (1, 0, 2))
 
-    return Projections, angles
+    return Projections
 
 
-def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, angles_gen_mode=None, output_file_name=None):
+def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, Angles=None, angles_gen_mode=None, output_file_name=None, dtype=np.float32):
     """
     input_file_path: str
         Full path to the *.mrc file with 3D volume
@@ -90,37 +61,52 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, an
         Just the name of the output *.mat file. 
         If not specified, it will be generated automatically.
     """
+    if AngCoverage is not None and AngShift is not None and Angles is not None:
+        raise Exception("Please specify either AngCoverage and AngShift or just Angles")
+    elif AngCoverage is not None and AngShift is not None and angles_gen_mode=='given':
+        raise Exception("When AngCoverage and AngShift, the parameter angles_gen_mode cannot be `given`")
+    elif Angles is None and angles_gen_mode=='given':
+        raise Exception("When angles_gen_mode is `given` then Angles needs to be provided")
+
     # nber of projs created in a single ASTRA loop
-    BatchSizeAstra = 50 
+    BatchSizeAstra = 50
+    Vol = None 
 
     # filepaths 
     protein_name = input_file_path.split('/')[-1].split('.')[0]
-    coverage_str = str(AngCoverage).replace(" ", "")[1:-1]
-    shift_str    = str(AngShift).replace(" ", "")[1:-1]
-    output_file_name = output_file_name or f'{protein_name}_ProjectionsAngles_ProjNber{ProjNber}_AngCoverage{coverage_str}_AngShift{shift_str}.h5'
+    if angles_gen_mode != 'given':
+        coverage_str = str(AngCoverage).replace(" ", "")[1:-1]
+        shift_str    = str(AngShift).replace(" ", "")[1:-1]
+        output_file_name = output_file_name or f'{protein_name}_ProjectionsAngles_ProjNber{ProjNber}_AngCoverage{coverage_str}_AngShift{shift_str}.h5'
+    else:
+        output_file_name = output_file_name or f'{protein_name}_Mode{angles_gen_mode}.h5'
+
+
     # get file extension
     extension = output_file_name.split('.')[-1]
     # storing output where the input mrc file is
-    proj_ang_path = os.path.join(os.path.dirname(input_file_path), output_file_name)
+    proj_ang_path = output_file_name  #os.path.join(os.path.dirname(input_file_path), output_file_name)
+    get_directory = '/'.join(proj_ang_path.split("/")[:-1])
+    pathlib.Path(get_directory).mkdir(parents=True, exist_ok=True)
 
     # loads data if data already exists 
     if os.path.exists(proj_ang_path):
-        print('* Loading the dataset *\n')
+        print('* Loading the dataset *')
 
         # read from the file
         if extension == "h5":
             with h5py.File(proj_ang_path, 'r') as data:
-                Projections = np.float32(data['Projections'])
-                Angles      = np.float32(data['Angles'])
+                Projections = dtype(data['Projections'])
+                Angles      = dtype(data['Angles'])
         elif extension == "mat":
             with sio.loadmat(proj_ang_path) as data:
-                Projections = np.float32(data['Projections'])
-                Angles      = np.float32(data['Angles'])
+                Projections = dtype(data['Projections'])
+                Angles      = dtype(data['Angles'])
         else: 
             raise NotImplementedError(f"Extension {extension} is not implemented")
     # generate data if data doesn't exist  
     else:
-        print('* Generating the dataset *\n')
+        print('* Generating the dataset *')
 
         # Load 3D volume
         # Value error fix explained here: https://mrcfile.readthedocs.io/en/latest/usage_guide.html 
@@ -135,20 +121,50 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, an
                 ProjSize = int(np.sqrt(np.sum(np.square(Vol.shape))))
 
         # Initialisations 
-        Projections = np.zeros((ProjNber, ProjSize, ProjSize), dtype=float)
-        Angles      = np.zeros((ProjNber, 3), dtype=float)
+        Projections = np.zeros((ProjNber, ProjSize, ProjSize), dtype=dtype)
+
+        if Angles is None:
+            Angles = np.zeros((ProjNber, 3), dtype=dtype)
+
+            # Generate random angles
+            if angles_gen_mode == "uniform_angles":
+                Z1 =  AngShift[0]*np.pi + AngCoverage[0]*np.pi*np.random.random(size=(ProjNber, 1))
+                Y2 =  AngShift[1]*np.pi + AngCoverage[1]*np.pi*np.random.random(size=(ProjNber, 1))
+                Z3 =  AngShift[2]*np.pi + AngCoverage[2]*np.pi*np.random.random(size=(ProjNber, 1))
+                Angles = np.concatenate((Z1, Y2, Z3), axis=1)
+            elif angles_gen_mode == "uniform_S2":
+                compensation =  10 * 2/(AngCoverage[1]*AngCoverage[2]) 
+                #print("compensation", compensation)
+                quaternions = quaternion.normalized_random_uniform(quaternion_shape=(int(compensation*ProjNber),))
+                Angles = quaternion2euler(quaternions).numpy()
+                
+                for i, a in enumerate(Angles):
+                    Angles[i] = [a[0]%(2*np.pi), a[1]%(np.pi), a[2]%(2*np.pi)]
+                
+                indices = np.where((AngShift[0]*np.pi<=Angles[:,0]) & (Angles[:,0]<=AngShift[0]*np.pi+AngCoverage[0]*np.pi) & \
+                                (AngShift[1]*np.pi<=Angles[:,1]) & (Angles[:,1]<=AngShift[1]*np.pi+AngCoverage[1]*np.pi) & \
+                                (AngShift[2]*np.pi<=Angles[:,2]) & (Angles[:,2]<=AngShift[2]*np.pi+AngCoverage[2]*np.pi))[0]
+                
+                indices = indices[:ProjNber]
+                Angles = np.take(Angles, indices, axis=0)
+            else:
+                raise NotImplemented(f"This coverage is not implemented yet - {angles_gen_mode}!")
+        print(Angles.shape)
+
+        # Explicitly putting the first set of angles to 0,0,0 for future debugging if needed
+        Angles[0] = [0, 0, 0]
 
         # Generate projs with ASTRA by batches 
         Iter = int(ProjNber/BatchSizeAstra) 
         for i in range(Iter):
 
             # Generate projections 
-            projections, angles = gen_projs_ASTRA(Vol, AngCoverage, AngShift, ProjSize, BatchSizeAstra, angles_gen_mode)
+            projections = generate_projections_ASTRA(Vol, Angles[i*BatchSizeAstra : (i + 1)*BatchSizeAstra], ProjSize, BatchSizeAstra)
 
             # Concatenate generated projections 
             Projections[i*BatchSizeAstra : (i + 1)*BatchSizeAstra, :, :] = projections
-            Angles[i*BatchSizeAstra : (i + 1)*BatchSizeAstra, :] = angles  
 
+        Projections = np.array(Projections, dtype=dtype)
         # Save data 
         if extension == "h5":
             with h5py.File(proj_ang_path, 'w') as hf:
@@ -160,5 +176,10 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, an
         else:
             raise NotImplementedError(f"Extension {extension} is not implemented")
 
-    print(f'Projections: {Projections.shape}')
-    print(f'Angles: {Angles.shape}\n')
+    print(f"Protein:         {protein_name}")
+    print(f"Input filename:  {input_file_path}")
+    print(f"Output filename: {output_file_name}")
+    if Vol is not None: print(f"Volume:          {Vol.shape}")
+    print(f'Projections (#): {Projections.shape}')
+    print(f'Angles (#):      {Angles.shape}\n')
+    print('*'*10)

@@ -8,65 +8,73 @@ import seaborn as sns; sns.set(style="white", color_codes=True)
 import pandas as pd
 from matplotlib._png import read_png
 from cryoem.conversions import euler2quaternion, d_q
+from tensorflow.keras.losses import MAE
 
-fg_color = 'white'
-bg_color = 'black'
+bg_color = 'white'
+fg_color = 'black'
 
-def _plot(image, title, ax, colorbar=False):
-    # NOTE: used
+def _plot(fig, image, title, ax, colorbar=False, plot_settings=None):
+    plot_settings_default = dict(
+        fg_color='black',
+        bg_color='white',
+        figsize=(12, 5),
+        fontsize=20)
+    if plot_settings is None:
+        plot_settings = {}
+    plot_settings_final = {**plot_settings_default, **plot_settings}
+
+    fig.patch.set_facecolor(plot_settings_final["bg_color"])  
+    
     im = ax.imshow(image)
-  
+      
     # set title plus title color
-    ax.set_title(title, color=fg_color)
+    ax.set_title(title, color=plot_settings_final["fg_color"], fontdict=dict(fontsize=plot_settings_final["fontsize"]))
 
     # set figure facecolor
-    ax.patch.set_facecolor(bg_color)
+    ax.patch.set_facecolor(plot_settings_final["bg_color"])
 
     # set tick and ticklabel color
-    im.axes.tick_params(color=fg_color, labelcolor=fg_color)
+    im.axes.tick_params(color=plot_settings_final["fg_color"], labelcolor=plot_settings_final["fg_color"])
 
     # set imshow outline
     for spine in im.axes.spines.values():
-        spine.set_edgecolor(fg_color)    
+        spine.set_edgecolor(plot_settings_final["fg_color"])    
 
     if colorbar:
         cb = plt.colorbar(im)
         # set colorbar label plus label color
-        cb.set_label('Pixel value', color=fg_color)
+        cb.set_label('Densities', color=plot_settings_final["fg_color"])
 
         # set colorbar tick color
-        cb.ax.yaxis.set_tick_params(color=fg_color)
+        cb.ax.yaxis.set_tick_params(color=plot_settings_final["fg_color"])
 
         # set colorbar edgecolor 
-        cb.outline.set_edgecolor(fg_color)
+        cb.outline.set_edgecolor(plot_settings_final["fg_color"])
 
         # set colorbar ticklabels
-        plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color=fg_color)
+        plt.setp(plt.getp(cb.ax.axes, 'yticklabels'), color=plot_settings_final["fg_color"])
         
-def plot_projection(projection, angles):
-    # NOTE: used
-    projection = np.squeeze(projection)
+def plot_projection(image, title, colorbar=True, plot_settings=None):
+    sns.set_style("whitegrid", {'axes.grid' : False})
 
     fig, ax = plt.subplots(1, 1, figsize=(7, 7))
     
-    _plot(projection, f"Angles: {', '.join([f'{x:.2f}' for x in angles])} [rad]", ax, colorbar=True)
+    _plot(fig, image, title, ax, plot_settings=plot_settings, colorbar=colorbar)
 
-    fig.patch.set_facecolor(bg_color) 
     plt.tight_layout()
     plt.show()
     
-def plot_projections(images, titles, nrows=2, ncols=5):
-    fig, axes = plt.subplots(nrows, ncols, figsize=(25, 10))
+def plot_projections(images, titles, nrows=2, ncols=5, plot_settings=None):
+    sns.set_style("whitegrid", {'axes.grid' : False})
+    
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5*ncols, 5*nrows))
     
     cr = [(i, j) for i in range(nrows) for j in range(ncols)]
     
     for image, title, (i, j) in zip(images, titles, cr):
-        
-        _plot(image, title, axes[i][j] if nrows>1 else axes[j], colorbar=False)
-
-    fig.patch.set_facecolor(bg_color)    
+        _plot(fig, image, title, axes[i][j] if nrows>1 else axes[j], plot_settings=plot_settings, colorbar=False)
+  
     plt.tight_layout()
-
     plt.show()
 
 ##################### SPHERES #####################
@@ -76,8 +84,7 @@ def save_space_plot(filename):
     ipv.savefig(f"{filename}.png")
 
 
-def plot_detector_pixels(angles):
-    # NOTE: used
+def plot_euclidean_space(angles):
     ipv.clear()
 
     if isinstance(angles[0], tf.Variable):
@@ -422,7 +429,7 @@ def _getXYZ(p1, angles, projection, img_size_scale):
 def plot_images(angles, projections, indices=range(3), img_size_scale=0.05):
     arr = RotationMatrix(angles)
 
-    ipv.clear()
+    #ipv.clear()
     ipv.figure(width=500, height=500)
     indices=indices if indices else range(len(arr))
 
@@ -511,7 +518,6 @@ def plot_selected_angles_with_3rd_angle_magnitude(angles, angles_true, indices):
 ##################### Data Info Plots #####################
 
 def plot_angles_count(angles):
-    # NOTE: used
     sns.set(style="white", color_codes=True)
     sns.set(style="whitegrid")
 
@@ -583,53 +589,236 @@ def plot_distances_count(angles_predicted, angles_true):
 #     return plt
 
 
-def plot_dP_dQ(dP_values, dQ_values, file_name=None):
-    plt.clf()
+def plot_dP_dQ(dP_values, dQ_values):
+    sns.set_style("whitegrid", {'axes.grid' : True})
     # Creating the dataframe for SNS plot
-    data = {"d_Q" : dQ_values, #tr_y.numpy(),
-            "d_P" : dP_values } #y_tr_pred.T[0]}
+    data = {"d_Q" : dQ_values, 
+            "d_P" : dP_values } 
     df1 = pd.DataFrame(data=data)
 
-    # Creating the dataframe for SNS plot
-    # data = {"d_Q" : val_y.numpy(),
-    #         "d_P" : y_val_pred.T[0]}
-    # df2 = pd.DataFrame(data=data)
-
-    plt.clf();
-    fig, ax = plt.subplots(1, 1, figsize=(6,6));
+    _, ax = plt.subplots(1, 1, figsize=(6,6));
     sns.scatterplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", ax=ax);  # "reg", "kde"
-    #sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde", ax=ax[1]);  # "reg", "kde"
     x = np.arange(0, np.pi);
-    sns.regplot(x=x, y=x, color="k", ax=ax)
-    if file_name:
-        plt.savefig(f"{file_name[:-4]}1.png", dpi=150)
+    sns.regplot(x=x, y=x, color="k", ax=ax);
     plt.show();
 
-    plt.clf()
     # Creating the dataframe for SNS plot
-    data = {"d_Q" : dQ_values, #tr_y.numpy(),
-            "d_P" : dP_values } #y_tr_pred.T[0]}
+    data = {"d_Q" : dQ_values,
+            "d_P" : dP_values } 
     df1 = pd.DataFrame(data=data)
 
-    # Creating the dataframe for SNS plot
-    # data = {"d_Q" : val_y.numpy(),
-    #         "d_P" : y_val_pred.T[0]}
-    # df2 = pd.DataFrame(data=data)
-
-    plt.clf();
-    #sns.scatterplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", ax=ax[0]);  # "reg", "kde"
+    #plt.clf();
     sns.jointplot(x="d_Q", y="d_P", data=df1, color="b", alpha=0.3, label="projection pair", kind="kde");  # "reg", "kde"
-    
-    if file_name:
-        plt.savefig(f"{file_name[:-4]}2.png", dpi=150)
     plt.show();
 
     # variance
     variance = np.sqrt(1/(len(dQ_values)-1)*np.sum(np.power(dP_values-dQ_values, 2)))
-    print(f"Variance = {variance}")
-
     ar_loss = lambda dQ_values, dP_values: tf.reduce_mean(tf.pow((dQ_values - dP_values), 2))
     loss = ar_loss(dQ_values, dP_values).numpy()
+    print(f"Variance = {variance}")
     print(f"Min. angle recovery loss possible = {loss}")
+    print("MAE: ", MAE(dQ_values, dP_values).numpy())
 
+
+import mrcfile
+import ipyvolume as ipv
+
+def plot_detector_pixels_with_protein(angles, mrc_filename, center=None, radius=None):
     
+    # Save reconstruction to mrc file for chimera
+    if mrc_filename:
+        with mrcfile.open(mrc_filename) as mrcVol:
+            reconstruction = np.array(mrcVol.data) 
+    
+    center = center or [0,0,0]
+    radius = radius or 50.0
+    # NOTE: used
+    ipv.clear()
+
+    arr = RotationMatrix(angles)
+
+    ipv.figure(width=500, height=500)
+    ipv.volshow(reconstruction, level=[0.1, 0.1], opacity=0.2,  data_min=reconstruction.min(), data_max=reconstruction.max())
+    
+    ipv.scatter(center[0]+arr[:, 0]*radius, 
+                center[1]+arr[:, 1]*radius, 
+                center[2]+arr[:, 2]*radius, 
+                marker="sphere", color="blue", size=1)
+    ipv.xlim(center[0]-radius, center[0]+radius)
+    ipv.ylim(center[1]-radius, center[1]+radius)
+    ipv.zlim(center[2]-radius, center[2]+radius)
+    ipv.show()
+
+
+def plot_angles_histogram(angles_list, labels=None, plot_settings=None):
+    sns.set_style("whitegrid", {'axes.grid' : True})
+    plot_settings_default = dict(alpha=0.7,
+        width=0.8,
+        label_size=20,
+        tick_size=18,
+        legend_size=20,
+        figsize=(10, 4))
+    if plot_settings is None:
+        plot_settings = {}
+    plot_settings_final = {**plot_settings_default, **plot_settings}
+
+    # angles histogram
+    fig, axs = plt.subplots(1, 3, figsize=plot_settings_final["figsize"], sharey=True)
+    plt.axis('on')
+
+    for i in range(len(angles_list)):
+        axs[0].hist(angles_list[i][:,0]%(2*np.pi), alpha=plot_settings_final["alpha"])
+        axs[1].hist(angles_list[i][:,1], alpha=plot_settings_final["alpha"])
+        axs[2].hist(angles_list[i][:,2]%(2*np.pi), alpha=plot_settings_final["alpha"], label="" if labels is None else labels[i])
+
+    axs[0].set_xlabel(r"$\theta_3$ [rad]", fontsize=plot_settings_final["label_size"])
+    axs[0].set_ylabel("Number of orientations", fontsize=plot_settings_final["label_size"])
+    axs[1].set_xlabel(r"$\theta_2$ [rad]", fontsize=plot_settings_final["label_size"])
+    axs[2].set_xlabel(r"$\theta_1$ [rad]", fontsize=plot_settings_final["label_size"])
+    axs[0].set_xlim(0,2*np.pi)
+    axs[1].set_xlim(0,np.pi)
+    axs[2].set_xlim(0,2*np.pi)
+    axs[0].yaxis.set_major_locator(plt.MaxNLocator(2))
+    axs[1].xaxis.set_major_locator(plt.MaxNLocator(steps=[1]))
+
+    axs[0].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    axs[1].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    axs[2].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    
+    if labels and len(labels) != 0:
+        plt.legend(fontsize=plot_settings_final["legend_size"], bbox_to_anchor=(1.04,1))
+    plt.subplots_adjust(wspace=0.01)
+    plt.tight_layout()
+    plt.show();
+    
+def plot_quaternions_histogram(q_trues, labels=None, plot_settings=None):
+    sns.set_style("whitegrid", {'axes.grid' : True})
+    plot_settings_default = dict(alpha=0.7,
+        width=0.1,
+        label_size=20,
+        tick_size=18,
+        legend_size=20,
+        figsize=(12, 4))
+    if plot_settings is None:
+        plot_settings = {}
+    plot_settings_final = {**plot_settings_default, **plot_settings}
+
+    fig, axs = plt.subplots(1, 4, figsize=plot_settings_final["figsize"], sharey=True)
+    plt.axis('on')
+    
+    for i in range(len(q_trues)):
+        axs[0].hist(q_trues[i][:,3], alpha=plot_settings_final["alpha"])
+        axs[1].hist(q_trues[i][:,0], alpha=plot_settings_final["alpha"])
+        axs[2].hist(q_trues[i][:,1], alpha=plot_settings_final["alpha"])
+        axs[3].hist(q_trues[i][:,2], alpha=plot_settings_final["alpha"], label="" if labels is None else labels[i])
+        
+
+    axs[0].set_xlabel("$a$", fontsize=plot_settings_final["label_size"])
+    axs[0].set_ylabel("Number of orientations", fontsize=plot_settings_final["label_size"])
+    axs[1].set_xlabel("$b$", fontsize=plot_settings_final["label_size"])
+    axs[2].set_xlabel("$c$", fontsize=plot_settings_final["label_size"])
+    axs[3].set_xlabel("$d$", fontsize=plot_settings_final["label_size"])
+    axs[0].set_xlim(-1,1)
+    axs[1].set_xlim(-1,1)
+    axs[2].set_xlim(-1,1)
+    axs[3].set_xlim(-1,1)
+    axs[0].yaxis.set_major_locator(plt.MaxNLocator(2))
+    axs[0].xaxis.set_major_locator(plt.MaxNLocator(steps=[1]))
+    axs[1].xaxis.set_major_locator(plt.MaxNLocator(steps=[1]))
+    axs[2].xaxis.set_major_locator(plt.MaxNLocator(steps=[1]))
+    axs[3].xaxis.set_major_locator(plt.MaxNLocator(steps=[1]))
+
+    axs[0].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    axs[1].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    axs[2].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    axs[3].tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+
+    if labels and len(labels) != 0:
+        plt.legend(fontsize=plot_settings_final["legend_size"], bbox_to_anchor=(1.04,1))
+    plt.subplots_adjust(wspace=0.001)
+    plt.tight_layout()
+    plt.show();
+
+def plot_distances_histogram(angles_list, labels=None, plot_settings=None):
+    sns.set_style("whitegrid", {'axes.grid' : True})
+    plot_settings_default = dict(alpha=0.5,
+        width=0.8,
+        label_size=22,
+        tick_size=18,
+        legend_size=20)
+    if plot_settings is None:
+        plot_settings = {}
+    plot_settings_final = {**plot_settings_default, **plot_settings}
+    
+    idx1 = list(np.random.choice(range(5000), size=10000))
+    idx2 = list(np.random.choice(range(5000), size=10000))
+
+    fig, ax = plt.subplots(figsize=(10,6));
+    
+    for j in range(len(angles_list)):
+        q1_true = euler2quaternion([angles_list[j][i] for i in idx1])
+        q2_true = euler2quaternion([angles_list[j][i] for i in idx2])
+        dQ = d_q(q1_true, q2_true).numpy()
+        ax.hist(dQ, alpha=plot_settings_final["alpha"], label="" if labels is None else labels[j]);  
+
+    ax.set_xlim(0, np.pi)
+    ax.set_xlabel("$d_q(q_i, q_j)$", fontsize=plot_settings_final["label_size"])
+    ax.set_ylabel("Number of orientations", fontsize=plot_settings_final["label_size"])
+    ax.yaxis.set_major_locator(plt.MaxNLocator(4))
+    ax.xaxis.set_major_locator(plt.MaxNLocator(steps=[1,2,3]))
+    if labels and len(labels) != 0:
+        plt.legend(bbox_to_anchor=(1.04,1), fontsize=plot_settings_final["legend_size"])
+    plt.tick_params(axis='both', which='major', labelsize=plot_settings_final["tick_size"])
+    plt.tight_layout()
+    plt.show();
+
+def plot_euclidean_dPdQ(angles_true, projections, d_p):
+    sns.set_style("whitegrid", {'axes.grid' : True})
+    label_size = 20
+    legend_size = 12
+    tick_size = 20
+
+    # Plot convergence.
+    all_q_dist = []
+    all_p_dist = []
+
+    fig, ax = plt.subplots(figsize=(7,7))
+
+    step = 1000
+    #indices_main = [2,3 , 4, 5, 7]  #range(0, 5000, step)
+
+    for idx in range(5):
+        d_q_list = []
+        d_p_list = []
+
+        # Sample some pairs.
+        idx1 = list([idx]*5000)
+        idx2 = list(range(5000))
+
+        # Compute distances between quaternions
+        q1 = euler2quaternion([angles_true[i] for i in idx1])
+        q2 = euler2quaternion([angles_true[i] for i in idx2])
+        distance_target_q = d_q(q1, q2)
+
+        # Compute distances between projections
+        p1 = np.array([projections[i] for i in idx1])
+        p2 = np.array([projections[i] for i in idx2])
+        distance_target_p = d_p(p1, p2)
+
+        data = {"d_Q" : distance_target_q, 
+                "d_P" : distance_target_p.numpy() }
+        df1 = pd.DataFrame(data=data)
+
+
+        sns.scatterplot(x="d_Q", y="d_P", data=df1, alpha=0.99, ax=ax, s=35, label=r"$\{("+f"{idx*step+1}"+r", p)\}_{{p=1}}^P$");  # "reg", "kde" , 
+
+
+    ax.set_xlim(0, np.pi)
+    plt.xlabel("$d_q(q_i, q_j)$", fontsize=label_size)
+    plt.ylabel("$\widehat{d_p}(\mathbf{p}_i, \mathbf{p}_j)$", fontsize=label_size)
+    ax.xaxis.set_major_locator(plt.MaxNLocator(steps=[1,2,3]))
+    ax.yaxis.set_major_locator(plt.MaxNLocator(3))
+    ax.tick_params(axis='both', which='major', labelsize=tick_size)
+    ax.legend(fontsize=legend_size)
+    plt.tight_layout()
+    plt.show()

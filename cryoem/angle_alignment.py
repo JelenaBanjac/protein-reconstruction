@@ -234,28 +234,28 @@ def training_angle_alignment(num_runs, steps, batch_size, optimizer, angles_true
     sns.set(style="white", color_codes=True)
     sns.set(style="whitegrid")
 
-    fig, axs = plt.subplots(1, 2, figsize=(18,7))
+    fig, ax = plt.subplots(figsize=(9,7))
     plt.title(title, fontsize=22)
     # Optimization loss subplot
-    axs[0].plot(d['losses'][idx], marker="o", lw=1, markersize=3)
-    axs[0].set_xlabel('steps [#]')
-    axs[0].set_ylabel('loss');
-    axs[0].set_title(f"Angle alignment optimization \nLOSS={np.mean(d['losses'][idx][-10:-1]):.2e}")
+    #axs[0].plot(d['losses'][idx], marker="o", lw=1, markersize=3)
+    #axs[0].set_xlabel('steps [#]')
+    #axs[0].set_ylabel('loss');
+    #axs[0].set_title(f"Angle alignment optimization \nLOSS={np.mean(d['losses'][idx][-10:-1]):.2e}")
 
     # Distance count subplot (full)
     q_predicted_rot = update_quaternion(d['m'][idx], d['a_R'][idx], q_predicted)
     d2 = d_q(q_predicted_rot, q_true)
-    axs[1].set_xlim(0, np.pi)
-    axs[1].set_title(f"Distances between true and predicted angles\nMEAN={np.mean(d2):.2e}rad ({np.degrees(np.mean(d2)):.2e}$\degree$) STD={np.std(d2):.2e}\nMEDIAN={np.median(d2):.2e}rad ({np.degrees(np.median(d2))}$\degree$)")
-    s = sns.distplot(d2, kde=False, bins=100, ax=axs[1], axlabel="Distance [rad]", color="r")
-    max_count = int(max([h.get_height() for h in s.patches]))
-    axs[1].plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
+    ax.set_xlim(0, np.pi)
+    ax.set_title(f"Distances between true and predicted angles")
+    s = sns.distplot(d2, kde=False, bins=100, ax=ax, axlabel="Distance [rad]", color="r")
+    #max_count = int(max([h.get_height() for h in s.patches]))
+    #ax.plot([np.mean(d2)]*max_count, np.arange(0, max_count,1), c="r", lw=4)
     
     m, a_R, losses, collect_data, trajectory = d['m'][idx], d['a_R'][idx], d['losses'][idx], d['collect_data'][idx], d['trajectory'][idx]
     trajectory_first = trajectory[0]
     loss_first = losses[0]
     trajectory_last = trajectory[-1]
-    loss_last = losses[-1]
+    loss_last = np.median(d2) #losses[-1]
 
     print("m=", m, "\ntrajectory_first=",trajectory_first, "\nloss_first=",loss_first, "\ntrajectory_last=", trajectory_last, "\nloss_last=", loss_last)
     return m, a_R, losses, collect_data, trajectory
