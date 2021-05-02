@@ -27,6 +27,7 @@
 1. [Distance estimation](https://jelenabanjac.com/protein-reconstruction/phase1_intro.html): learn a function to estimate the distance between two projections
 2. [Orientation recovery](https://jelenabanjac.com/protein-reconstruction/phase2_intro.html): recover the projections' orientations from estimated distances
 3. [Protein reconstruction](https://jelenabanjac.com/protein-reconstruction/phase3_intro.html): reconstruct the protein from its projections and their recovered orientations
+4. [Miscellaneous notebooks](https://github.com/JelenaBanjac/protein-reconstruction/tree/master/notebooks/misc-notebooks): non-clean notebooks during developing process, use at your own risk.
 
 The notebooks in each folder represent different experimental conditions or modeling approach.
 
