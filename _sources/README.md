@@ -5,7 +5,7 @@
 [Michaël Defferrard](https://deff.ch/), LTS2, EPFL.
 
 * Paper: [`arXiv:2104.06237`](https://arxiv.org/abs/2104.06237)
-* Website with interactive visualizations: <https://jelenabanjac.com/protein-reconstruction/home.html>
+* Website with interactive visualizations: <https://jelenabanjac.com/protein-reconstruction/index.html>
 
 > A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that the orientations adopted by the 3D particles prior to imaging are unknown; yet, this knowledge is essential for high-resolution reconstruction.
 > We present a method to recover these orientations directly from the acquired set of 2D projections.
