@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning to recover orientations from projections in single-particle cryo-EM &#8212; Protein 3D Poses Recovery</title>
+    
+  <link href="_static/css/theme.css" rel="stylesheet" />
+  <link href="_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/togglebutton.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script async="async" kind="hypothesis" src="https://hypothes.is/embed.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.18.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://jelenabanjac.com/protein-reconstruction/index.html/README.html" />
+    <link rel="shortcut icon" href="_static/logo.gif"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Phase 0: Data Generation" href="phase0_intro.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      <img src="_static/logo.gif" class="logo" alt="logo">
+      
+      
+      <h1 class="site-logo" id="site-title">Protein 3D Poses Recovery</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <p class="caption">
+ <span class="caption-text">
+  Notebooks
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="phase0_intro.html">
+   Phase 0: Data Generation
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/0-data-preparation/1-chimera.html">
+     Chimera
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/0-data-preparation/2-generate-projections-and-angles.html">
+     Data Generation and Exploration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/0-data-preparation/3-coverage-comparisons.html">
+     Different Sphere Coverage Comparisons
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="phase1_intro.html">
+   Phase 1: Distance Function
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/1-distance-estimation/1-perfect-distance-and-perturbed.html">
+     Perfect Distance and Perturbed Distance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/1-distance-estimation/2-euclidean-distance.html">
+     Euclidean Distance as a Baseline
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/1-distance-estimation/3-learned-distance.html">
+     Learned Distance
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="phase2_intro.html">
+   Phase 2: Orientation Recovery
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/2-orientation-recovery/1-perfect-distance-and-perturbed.html">
+     Orientation Recovery with Perfect Distance
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/2-orientation-recovery/2-learned-distance.html">
+     Orientation Recovery with Learned Distance
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="phase3_intro.html">
+   Phase 3: Reconstruction
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="notebooks/3-protein-reconstruction/1-reconstruction.html">
+     Protein Reconstruction
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="_sources/README.md"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.md</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Connect with source repository"><i class="fab fa-github"></i></button>
+    <div class="dropdown-buttons sourcebuttons">
+        <a class="repository-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction/"><button type="button" class="btn btn-secondary topbarbtn"
+                data-toggle="tooltip" data-placement="left" title="Source repository"><i
+                    class="fab fa-github"></i>repository</button></a>
+        <a class="issues-button"
+            href="https://github.com/JelenaBanjac/protein-reconstruction//issues/new?title=Issue%20on%20page%20%2FREADME.html&body=Your%20issue%20content%20here."><button
+                type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip" data-placement="left"
+                title="Open an issue"><i class="fas fa-lightbulb"></i>open issue</button></a>
+        
+    </div>
+</div>
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#">
+   Learning to recover orientations from projections in single-particle cryo-EM
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#repository-content">
+   Repository content
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#installation">
+   Installation
+  </a>
+ </li>
+ <li class="toc-h1 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#licence-citation">
+   Licence &amp; citation
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="learning-to-recover-orientations-from-projections-in-single-particle-cryo-em">
+<h1>Learning to recover orientations from projections in single-particle cryo-EM<a class="headerlink" href="#learning-to-recover-orientations-from-projections-in-single-particle-cryo-em" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://jelenabanjac.com">Jelena Banjac</a>, Data Science master student,
+<a class="reference external" href="https://people.epfl.ch/laurene.donati">Laurène Donati</a>, BIG,
+<a class="reference external" href="https://deff.ch/">Michaël Defferrard</a>, LTS2, EPFL.</p>
+<ul class="simple">
+<li><p>Paper: <a class="reference external" href="https://arxiv.org/abs/2104.06237"><code class="docutils literal notranslate"><span class="pre">arXiv:2104.06237</span></code></a></p></li>
+<li><p>Website with interactive visualizations: <a class="reference external" href="https://jelenabanjac.com/protein-reconstruction/home.html">https://jelenabanjac.com/protein-reconstruction/home.html</a></p></li>
+</ul>
+<blockquote>
+<div><p>A major challenge in single-particle cryo-electron microscopy (cryo-EM) is that the orientations adopted by the 3D particles prior to imaging are unknown; yet, this knowledge is essential for high-resolution reconstruction.
+We present a method to recover these orientations directly from the acquired set of 2D projections.
+Our approach consists of two steps: (i) the estimation of distances between pairs of projections, and (ii) the recovery of the orientation of each projection from these distances.
+In step (i), pairwise distances are estimated by a Siamese neural network trained on synthetic cryo-EM projections from resolved bio-structures.
+In step (ii), orientations are recovered by minimizing the difference between the distances estimated from the projections and the distances induced by the recovered orientations.
+We evaluated the method on synthetic cryo-EM datasets.
+Current results demonstrate that orientations can be accurately recovered from projections that are shifted and corrupted with a high level of noise.
+The accuracy of the recovery depends on the accuracy of the distance estimator.
+While not yet deployed in a real experimental setup, the proposed method offers a novel learning-based take on orientation recovery in SPA.</p>
+</div></blockquote>
+<p><img alt="two-step method" src="_images/schematic_method_overview-1.jpg" /></p>
+</div>
+<div class="section" id="repository-content">
+<h1>Repository content<a class="headerlink" href="#repository-content" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://github.com/JelenaBanjac/protein-reconstruction/tree/master/notebooks">Notebooks</a>, used to reproduce our findings, are divided in the following phases:</p>
+<ol class="simple">
+<li><p><a class="reference external" href="https://jelenabanjac.com/protein-reconstruction/phase0_intro.html">Data preparation</a>: generate 2D projections from a protein</p></li>
+<li><p><a class="reference external" href="https://jelenabanjac.com/protein-reconstruction/phase1_intro.html">Distance estimation</a>: learn a function to estimate the distance between two projections</p></li>
+<li><p><a class="reference external" href="https://jelenabanjac.com/protein-reconstruction/phase2_intro.html">Orientation recovery</a>: recover the projections’ orientations from estimated distances</p></li>
+<li><p><a class="reference external" href="https://jelenabanjac.com/protein-reconstruction/phase3_intro.html">Protein reconstruction</a>: reconstruct the protein from its projections and their recovered orientations</p></li>
+</ol>
+<p>The notebooks in each folder represent different experimental conditions or modeling approach.</p>
+<p>Additionally, the <a class="reference external" href="https://github.com/JelenaBanjac/protein-reconstruction/tree/master/cryoem"><code class="docutils literal notranslate"><span class="pre">cryoem</span></code></a> python package contains scripts to generate a huge amount of 2D projections with corresponding orientation.</p>
+</div>
+<div class="section" id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+<p>Install the software dependencies:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># clone the repository</span>
+git clone https://github.com/JelenaBanjac/protein-reconstruction.git
+<span class="nb">cd</span> protein-reconstruction
+
+<span class="c1"># create and activate the environment</span>
+conda env create -f environment.yml
+conda activate protein_reconstruction
+</pre></div>
+</div>
+<p>Run the jupyter notebooks (<code class="docutils literal notranslate"><span class="pre">$1</span></code> is GPU id, <code class="docutils literal notranslate"><span class="pre">$2</span></code> is the port where jupyter is served if ran externally):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> notebooks
+<span class="nb">export</span> <span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="nv">$1</span>
+nohup jupyter notebook --ip<span class="o">=</span><span class="m">0</span>.0.0.0 --port<span class="o">=</span><span class="nv">$2</span> <span class="p">&amp;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="licence-citation">
+<h1>Licence &amp; citation<a class="headerlink" href="#licence-citation" title="Permalink to this headline">¶</a></h1>
+<p>The code in this repository is released under the terms of the <a class="reference external" href="https://github.com/JelenaBanjac/protein-reconstruction/blob/master/LICENSE">MIT license</a>.
+Please cite our paper if you use it.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>@inproceedings{cryoem_orientation_recovery,
+  title = {Learning to recover orientations from projections in single-particle cryo-EM},
+  author = {Banjac, Jelena, Donati, Laur\`ene, and Defferrard, Micha\&quot;el},
+  year = {2021},
+  archivePrefix={arXiv},
+  eprint={2104.06237},
+  url = {https://arxiv.org/abs/2104.06237},
+}
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='right-next' id="next-link" href="phase0_intro.html" title="next page">Phase 0: Data Generation</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By Jelena Banjac<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
