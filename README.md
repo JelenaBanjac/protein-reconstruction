@@ -58,24 +58,6 @@ export CUDA_VISIBLE_DEVICES=$1
 nohup jupyter notebook --ip=0.0.0.0 --port=$2 &
 ```
 
-## Package versions
-The following versions of the packages are used in the project.
-```
-python-3.6.8
-cudnn-7.1.3
-cudatoolkit-8.0
-```
-```
-cuda 10
-cuDNN 7
-nvidia driver 415
-```
-
-```
-$ nvcc --version
-$ cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
-```
-
 ## Licence & citation
 
 The code in this repository is released under the terms of the [MIT license](LICENSE).
