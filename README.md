@@ -45,12 +45,6 @@ conda env create -f environment.yml
 conda activate protein_reconstruction
 ```
 
-Optionally, test if some dependencies are properly installed:
-```bash
-python3 -c "import tensorflow as tf; print(tf.reduce_sum(tf.random.normal([1000, 1000])))"
-python3 -c "import astra; astra.test_CUDA()"
-```
-
 Run the jupyter notebooks (`$1` is GPU id, `$2` is the port where jupyter is served if ran externally):
 ```bash
 cd notebooks
