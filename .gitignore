@@ -1,3 +1,7 @@
+
+*.zip
+data/publication_plots_data/
+data/publication_plots_figures/
 notebooks/pdfs
 logs
 training
