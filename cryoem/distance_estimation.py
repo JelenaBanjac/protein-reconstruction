@@ -4,7 +4,7 @@ num_dec = 1
 num_bins = 32
 
 class DataGenerator(Sequence):
-    
+    """Custom datsaet generator used to create data for training of distance learning algorithm"""
     def __init__(self, X, y, list_ids, limit_num_pairs=None, limit_style="random", batch_size=256, shuffle=True):
         start_time = time()
         if batch_size > limit_num_pairs:
@@ -75,8 +75,8 @@ class DataGenerator(Sequence):
 
         # Generate data
         idx1, idx2 = list_ids_batch[:,0], list_ids_batch[:,1]
-        pairs = np.stack((self.X[idx1], self.X[idx2]), axis=1)  # shape: (len(idx1), 2, x.shape[1], x.shape[2], x.shape[3])
-        labels = d_q(euler2quaternion(self.y[idx1]), euler2quaternion(self.y[idx2]))  # shape: len(idx1)
+        pairs = np.stack((self.X[idx1], self.X[idx2]), axis=1)  
+        labels = d_q(euler2quaternion(self.y[idx1]), euler2quaternion(self.y[idx2])) 
 
         return [pairs[:, 0], pairs[:, 1]], labels 
         
@@ -88,31 +88,22 @@ class DataGenerator(Sequence):
             np.random.shuffle(self.indices)     
             
 import os
-import h5py
 from time import time, strftime
-from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
-from sklearn.model_selection import train_test_split
 import pathlib
-
-from cryoem.rotation_matrices import RotationMatrix
 from cryoem.conversions import euler2quaternion, d_q
 from cryoem.knn import get_knn_projections
 import pandas as pd
 import random
 import tensorflow as tf
-from tensorflow.keras.datasets import mnist
 from tensorflow.keras.models import Model
-from tensorflow.python.keras.applications.mobilenet import MobileNet
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, AvgPool2D, Lambda, ZeroPadding2D, Dropout, Concatenate, Dense, GlobalAveragePooling2D, Flatten
-from tensorflow.keras.optimizers import RMSprop, Adam, SGD
+from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras import backend as K
-from tensorflow.keras.callbacks import ModelCheckpoint,ReduceLROnPlateau
 from tensorflow.keras.callbacks import TensorBoard
-from tensorflow.keras.utils import plot_model#, multi_gpu_model
-from tensorflow.python.keras.applications.inception_v3 import InceptionV3
-from tensorflow.keras.losses import KLD, MAE, MSE
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras.losses import MAE, MSE
 import pandas as pd
 import seaborn as sns
 import io
@@ -121,6 +112,7 @@ import io
 model = None
 
 def cosine_distance(vests):
+    """Cosine distance between two feature vectors from every projection"""
     x, y = vests
     xy_sum_square = K.sum(x * y, axis=1, keepdims=True) 
     xx_sum_square = K.sum(x * x, axis=1, keepdims=True)
@@ -133,22 +125,23 @@ def cosine_distance(vests):
     return 2*tf.acos(tf.clip_by_value(cos_theta, 0.0+eps, 1.0-eps)) 
 
 def cos_dist_output_shape(shapes):
+    """The output shape of cosine distance"""
     shape1, shape2 = shapes
     return (shape1[0], 1)
 
 
 def mae(y_true, y_pred):
+    """Mean absolute error"""
     return MAE(y_true, y_pred) 
 
 def mse(y_true, y_pred):
+    """Mean square error"""
     return MSE(y_true, y_pred) 
 
 
 def create_siamese_network(input_shape):
-    '''Base network to be shared (eq. to feature extraction).
-    '''
+    """Base network to be shared (eq. to feature extraction)."""
     input_x = Input(shape=input_shape)
-    #print(input_shape)
 
     # add Convolution, MaxPool, Conv2D, remove Dropout and Dense
     x = Conv2D(filters=32, kernel_size=[7, 7], activation='relu', padding='same', kernel_initializer='glorot_uniform')(input_x)
@@ -180,11 +173,51 @@ def create_siamese_network(input_shape):
 
 
 def train_siamese(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, limit_style, path_logs_training, training_description="", training_steps=None, validation_steps=None, plot=True, gpus=None):
+    """Main method for learning the distance between two projections
+    
+    Parameters
+    ----------
+    X  : np.ndarray
+        The array containing the projections.
+    y : np.ndarray
+        The array containing the ground-truth angles for every projections.
+    train_idx : np.ndarray, list
+        The list of training indices.
+    val_idx : np.ndarray, list
+        The list of validation indices.
+    epochs : int
+        Number of epochs for neural network.
+    batch_size :
+        The size of data used for training.
+    learning_rate : float
+        The learning rate of the optimizer.
+    limit_style : str
+        The data will be generated: uniform, random.
+    path_logs_training : str
+        The path to logs.
+    training_description : str
+        Name for this training model.
+    training_steps=None, 
+        The number of training steps.
+    validation_steps=None, 
+        The number of validation steps.
+    plot=True, 
+        To plot or not to plot.
+    gpus=None
+        Used for multi-gpu training.
+
+    Returns
+    -------
+    model : keras model
+        Learned distance model
+    history1 : history
+        Contains information about MAE, MSE losses
+    """
     _idx1 = list(np.random.choice(val_idx, size=1000))
     _idx2 = list(np.random.choice(val_idx, size=1000))
 
-    q1_true = euler2quaternion([angles_true[i] for i in _idx1])
-    q2_true = euler2quaternion([angles_true[i] for i in _idx2])
+    q1_true = euler2quaternion([y[i] for i in _idx1])
+    q2_true = euler2quaternion([y[i] for i in _idx2])
 
     p1 = [X[i] for i in _idx1]
     p2 = [X[i] for i in _idx2]
@@ -213,7 +246,6 @@ def train_siamese(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, l
 
     def generate_dPdQ_plot(file_writer_plot):
         """Source: https://www.tensorflow.org/tensorboard/image_summaries#logging_arbitrary_image_data"""
-
         
         def _inner_plot(epoch, logs):
             """Generate dP/dQ plot for tensorboard"""
@@ -264,7 +296,7 @@ def train_siamese(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, l
         model = Model([input_a, input_b], distance)  # was m
 
         # train
-        #model = multi_gpu_model(m, gpus=gpus)
+        # model = multi_gpu_model(m, gpus=gpus)
         model.summary()
         plot_model(model, to_file=f"{path_logs_training}/model_plot_256d.png", expand_nested=True, show_shapes=True, show_layer_names=True)
 
@@ -287,7 +319,7 @@ def train_siamese(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, l
         file_writer_plot = tf.summary.create_file_writer(os.path.join(LOGS_PATH, "image"))
         plot_callback = tf.keras.callbacks.LambdaCallback(on_epoch_end=generate_dPdQ_plot(file_writer_plot))
         # Callback that will decrease LR if it gets plateau in val_loss
-        #reduce_on_plateau_callback = ReduceLROnPlateau(monitor="loss", mode="min", factor=0.1, patience=20, min_lr=1e-4, verbose=1)
+        # reduce_on_plateau_callback = ReduceLROnPlateau(monitor="loss", mode="min", factor=0.1, patience=20, min_lr=1e-4, verbose=1)
 
 
         history1 = model.fit(training_generator, 
@@ -326,6 +358,7 @@ def train_siamese(X, y, train_idx, val_idx, epochs, batch_size, learning_rate, l
         return model, history1
 
 def plot_results(projections, y_pred, y, strtype):
+    """Plot the projection, ground-truth and prediction"""
     if projections.shape[-1] == 1:
         projections = projections.reshape(list(projections.shape[:-2]) +[-1])
 

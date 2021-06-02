@@ -1,14 +1,12 @@
 import numpy as np
-from os import mkdir
-from os.path import join, isdir
-from imageio import imread, imwrite
 from cryoem.rotation_matrices import RotationMatrix
 import astra
 import mrcfile
 from pathlib import Path
 
+
 def reconstruct(projections, angles, alg_iterations=100, mrc_filename=None, initial_mrc_filename=None ,overwrite=False, vol_shape=None):
-    #batch_size=500, 
+    """Method used for protein reconstruction using ASTRA toolbox"""
     projections = np.array(projections, dtype=np.float32)
     
     proj_size = projections.shape[1]
@@ -50,16 +48,11 @@ def reconstruct(projections, angles, alg_iterations=100, mrc_filename=None, init
     astra.algorithm.run(algorithm_id, alg_iterations)
     reconstruction = astra.data3d.get(reconstruction_id)
     
-
-    
-
     # Cleanup.
     astra.algorithm.delete(algorithm_id)
     astra.data3d.delete(reconstruction_id)
     astra.data3d.delete(projections_id)
         
-        
-
     # Save reconstruction to mrc file for chimera
     if mrc_filename:
         Path(mrc_filename).parent.mkdir(parents=True, exist_ok=True)

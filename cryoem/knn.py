@@ -2,8 +2,11 @@
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 from time import time
+import os
+
 
 def get_knn_projections(k):
+    """Get k closest projections based on their distance"""
     start_time = time()
 
     _X = np.reshape(X, (X.shape[0], -1))

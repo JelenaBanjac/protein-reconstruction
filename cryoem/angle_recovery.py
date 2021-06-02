@@ -1,4 +1,3 @@
-# QUATERNION VARIABLE
 import time
 import numpy as np
 from IPython import display as IPyDisplay
@@ -6,15 +5,15 @@ from tensorflow.keras.optimizers import Adam
 import seaborn as sns; sns.set(style="white", color_codes=True)
 from tensorflow_graphics.geometry.transformation import quaternion
 from cryoem.conversions import euler2quaternion, d_q, quaternion2euler
+from cryoem.knn import get_knn_projections
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
 from pathlib import Path
 
-# TODO: add constraint on quaternion Variables
-
 
 def angles_transpose(angles):
+    """Transpose the angles"""
     angles = angles.copy()
     cols = [2, 1, 0]
     idx = np.empty_like(cols)
@@ -23,7 +22,7 @@ def angles_transpose(angles):
     return angles
 
 def quaternion_constraint(low_ang, high_ang):
-    
+    """Constrain the quaternion unit vector amplitudes for the angle recovery"""
     def _inner(q):
         e = quaternion2euler(q)
 
@@ -37,29 +36,62 @@ def quaternion_constraint(low_ang, high_ang):
         return q_new
 
     return _inner
+
+
+def train_angle_recovery(steps, batch_size, in_data, distance_fn, file_name, limit_distance=np.pi,
+                         low_ang_const=[0.0, 0.0, 0.0], high_ang_const=[2.0, 0.4, 2.0], q_predicted=None,
+                         angles_true=None, learning_rate=0.01, constraint=False): 
+    """Main method for angle recovery.
     
+    Parameters
+    ----------
+    steps : int
+        Number of steps to run the angle recovery.
+    batch_size : int
+        The number of training data points utilized in one iteration/step. 
+    in_data : np.array
+        Array of projections or array of angles. Array of projections is used for the full pipeline
+        when we have learned the distance between the projections. The array of angles is used when
+        we want to perform angle recovery assuming we know the distance (and take the quaternion distance).
+    distance_fn : callable
+        The distance function. If we have the array of projections, this is the distance between two projections.
+        If we have the array of angles, this is the distance between two quaternions (since angles will be converted to
+        quaternions interally).
+    file_name : str
+        File name where to store the losses and the predicted orientation for every projection.
+    limit_distance : float
+        Default value: np.pi, used to limit the distance between two projections, predicting only the closer ones. 
+        Not used anymore. 
+    low_ang_const : list
+        The lower bound for the angles we want to predict. Default value: [0.0, 0.0, 0.0], not used anymore.
+    high_ang_const :
+        The upper bound for the angles we want to predict. Default value: [2.0, 0.4, 2.0], not used anymore.
+    q_predicted : np.ndarray, tf.Tensor
+        Default value: None
+    angles_true : np.array
+        Default value: None
+    learning_rate : float
+        Optimizer's learning rate value. Default value: 0.01
+    constraint : bool
+        Whether to use the queaternion contraints or not. Default value: False
 
-
-def train_angle_recovery(steps, 
-                         batch_size, 
-                         in_data, 
-                         distance_fn, 
-                         file_name,
-                         limit_distance=np.pi,
-                         low_ang_const=[0.0, 0.0, 0.0],
-                         high_ang_const=[2.0, 0.4, 2.0],
-                         q_predicted=None,
-                         angles_true=None,
-                         learning_rate=0.01,
-                        constraint=False): 
+    Returns
+    -------
+    q_predicted : np.array
+        Predicted orientations (in quaternion).
+    losses : np.array
+        Angle recovery losses.
+    collect_daa : np.array
+        Predicted orientations from every step of optimization.
+    """                    
 
     time_start = time.time()
     collect_data = []
     optimizer = Adam(learning_rate=learning_rate)
 
-    #low_ang = [0.0*np.pi, 0.0*np.pi, 0.0*np.pi]
+    # low_ang = [0.0*np.pi, 0.0*np.pi, 0.0*np.pi]
     low_ang = list(map(lambda x: x*np.pi, low_ang_const))
-    #high_ang = [2.0*np.pi, 0.4*np.pi, 2.0*np.pi] 
+    # high_ang = [2.0*np.pi, 0.4*np.pi, 2.0*np.pi] 
     high_ang = list(map(lambda x: x*np.pi, high_ang_const))           
     euler = np.random.uniform(low=[low_ang[0], low_ang[1], low_ang[2]], 
                           high=[high_ang[0], high_ang[1], high_ang[2]],
@@ -185,6 +217,7 @@ def train_angle_recovery(steps,
     print(report)
     return quaternion.normalize(q_predicted).numpy(), losses, np.array(collect_data)
 
+
 def sample_iter(steps, projection_idx, num_pairs, style="random", k=None):
 
     for step in range(1, steps+1):
@@ -201,11 +234,13 @@ def sample_iter(steps, projection_idx, num_pairs, style="random", k=None):
             idx2 = [indices_p[i][np.random.randint(1, k)] for i in idx1]
 
         elif style=="knn_and_random":
+            # this option is not used anymore, left for reference
             # select random sample for the first element of pair
             idx1 = list(np.random.choice(projection_idx, size=num_pairs))
 
             # half from kNN
             indices_p, distances_p, A_p = get_knn_projections(k=k)
+            num_projections = len(projection_idx)
             idx2_knn = [indices_p[i][np.random.randint(1, k)] for i in idx1[:num_pairs//2]]
             idx2_random = list(np.random.randint(0, num_projections, num_pairs//2))
             # half random

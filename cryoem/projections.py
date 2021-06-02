@@ -1,18 +1,8 @@
-
-"""""
-@author: fangshu.yang@epfl.ch, laurene.donati@epfl.ch 
-"""
-
 import numpy as np
-import random
 import os, sys
 import scipy.io as sio
 sys.path.append(os.getcwd())
-import time
 import mrcfile
-import skimage
-from skimage import transform
-import matplotlib.pyplot as plt
 import astra
 import pathlib
 import h5py
@@ -22,8 +12,11 @@ from cryoem.conversions import quaternion2euler
 
  
 def generate_projections_ASTRA(Vol, Angles, ProjSize, BatchSizeAstra):
-    """
-    angles_gen_mode: str
+    """Generate projections with ASTRA toolbox
+
+    Parameters
+    ----------
+    angles_gen_mode : str
         Takes values in [`uniform_angles`, `uniform_quaternions`]
     """
     # Create 3D geometry in ASTRA
@@ -46,18 +39,21 @@ def generate_projections_ASTRA(Vol, Angles, ProjSize, BatchSizeAstra):
 
 
 def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, Angles=None, angles_gen_mode=None, output_file_name=None, dtype=np.float32):
-    """
-    input_file_path: str
+    """ Generate 2d protein projections
+
+    Parameters
+    ----------
+    input_file_path : str
         Full path to the *.mrc file with 3D volume
-    ProjNber: int
+    ProjNber : int
         Number of 2D projections 
-    AngCoverage: list
+    AngCoverage : list
         list of max values for each axis. E.g. `0.5,0.5,2.0` means it: x axis angle and y axis angle take values in range [0, 0.5*pi], z axis angles in range [0, 2.0*pi]
-    AngShift: list
+    AngShift : list
         Start of angular coverage
-	angles_gen_mode: str
+	angles_gen_mode : str
 		2 options: (1) generate angles uniformly in angle space - 'uniform_angles', and (2) generate angles uniformly in quaternion space - 'uniform_S3'
-    output_file_name: str
+    output_file_name : str
         Just the name of the output *.mat file. 
         If not specified, it will be generated automatically.
     """
@@ -80,7 +76,6 @@ def generate_2D_projections(input_file_path, ProjNber, AngCoverage, AngShift, An
         output_file_name = output_file_name or f'{protein_name}_ProjectionsAngles_ProjNber{ProjNber}_AngCoverage{coverage_str}_AngShift{shift_str}.h5'
     else:
         output_file_name = output_file_name or f'{protein_name}_Mode{angles_gen_mode}.h5'
-
 
     # get file extension
     extension = output_file_name.split('.')[-1]

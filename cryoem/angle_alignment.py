@@ -1,12 +1,8 @@
 import tensorflow as tf
-from tensorflow_graphics.geometry.transformation import quaternion
 from time import time
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set(style="white", color_codes=True)
-import random
-from tensorflow_graphics.math import vector
-from itertools import product
 import time
 from IPython import display as IPyDisplay
 from scipy.spatial.transform import Rotation as R
@@ -14,7 +10,16 @@ from cryoem.conversions import euler2quaternion, d_q
 
 
 def euler6tomarix4d(a_R):
-
+    """ Convert 6D vector containing angles to 4D rotation matrix
+    Parameters
+    ----------
+    a_R : tf.tensor/np.ndarray
+        Vector of shape (6,)
+    Returns
+    -------
+    R : tf.tensor/np.ndarray
+        4x4 Rotation matrix corresponding to these 6 angles of rotations
+    """
     xy, xz, xw, yz, yw, zw = tf.unstack(a_R, axis=-1)
     
     cxy = tf.cos(xy)
@@ -77,6 +82,22 @@ def euler6tomarix4d(a_R):
 
 
 def update_quaternion(m, a_R, q_predicted):
+    """Update old quaternion with learned rotation
+
+    Parameters
+    ----------
+    m : list of 4 floats (-1 or 1)
+        List of length 4 containing diagonal values for rotation matrix. It is used for flipping the rotation.
+        When diagonal value is -1, it is flipped. Otherwise, it is identity.
+    a_R : np.array
+        Array of shape (6,) containing the rotation angles used to align the old quaternion to the true one.
+    q_predicted : np.ndarray
+        Array of shape (N, 4). Quaternions that we will align.
+    Returns
+    -------
+    q_predicted_rotated: np.ndarray
+        Array of shape (N, 4). Rotated quaternion
+    """
     # 4D matrix rotation
     R = euler6tomarix4d(a_R)
     I = tf.linalg.diag(tf.convert_to_tensor(m, dtype=tf.float64))
@@ -85,6 +106,24 @@ def update_quaternion(m, a_R, q_predicted):
     return q_predicted_rotated
 
 def loss_alignment(m, a_R, q_predicted, q_true):
+    """Loss for optimization
+    
+    Parameters
+    ----------
+    m : list of 4 floats (-1 or 1)
+        List of length 4 containing diagonal values for rotation matrix. It is used for flipping the rotation.
+        When diagonal value is -1, it is flipped. Otherwise, it is identity.
+    a_R : np.array
+        Array of shape (6,) containing the rotation angles used to align the old quaternion to the true one.
+    q_predicted : np.ndarray
+        Array of shape (N, 4). Predicted/estimated quaternion.
+    q_true : np.ndarray
+        Array of shape (N, 4). Ground-truth quaternion.
+    
+    Returns
+    -------
+        Loss function specified as a mean of distances between true and predicted quaternion.
+    """
     # 4D matrix rotation
     R = euler6tomarix4d(a_R)
     I = tf.linalg.diag(tf.convert_to_tensor(m, dtype=tf.float64))
@@ -94,6 +133,27 @@ def loss_alignment(m, a_R, q_predicted, q_true):
 
 
 def gradient_alignment(m, a_R, q_predicted, q_true):
+    """Gradion for optimization
+     
+    Parameters
+    ----------
+    m : list of 4 floats (-1 or 1)
+        List of length 4 containing diagonal values for rotation matrix. It is used for flipping the rotation.
+        When diagonal value is -1, it is flipped. Otherwise, it is identity.
+    a_R : np.array
+        Array of shape (6,) containing the rotation angles used to align the old quaternion to the true one.
+    q_predicted : np.ndarray
+        Array of shape (N, 4). Predicted/estimated quaternion.
+    q_true : np.ndarray
+        Array of shape (N, 4). Ground-truth quaternion.
+
+    Returns
+    -------
+    loss_value : tf.tensor
+        Loss value for the optimization
+    gradient : tf.tensor
+        Gradient value
+    """
     with tf.GradientTape() as tape:
         loss_value = loss_alignment(m, a_R, q_predicted, q_true)
         gradient = tape.gradient(loss_value, a_R)
@@ -102,8 +162,42 @@ def gradient_alignment(m, a_R, q_predicted, q_true):
 
 
 def training_angle_alignment(num_runs, steps, batch_size, optimizer, angles_true, angles_predicted, threshold=None):
+    """Main method for angle alignment
+
+    Parameters
+    ----------
+    num_runs : int
+        Number of times to run angle alignment.
+    steps : int
+        Number of steps of optimization (gradient update).
+    batch_size : int
+        The number of training data points utilized in one iteration/step. 
+    optimizer : tf.keras.optimizers
+        The optimizer used for the ML optimization.
+    angles_true : np.ndarray
+        Array of shape (N, 3). Ground-truth angles.
+    angles_predicted :
+        Array of shape (N, 3). Predicted angles.
+    threshold : float
+        Loss threshold to use for early algorithm stopping.
+
+    Returns
+    -------
+    m : list of 4 floats (-1 or 1)
+        List of length 4 containing diagonal values for rotation matrix. It is used for flipping the rotation.
+        When diagonal value is -1, it is flipped. Otherwise, it is identity.
+    a_R : np.array
+        Array of shape (6,) containing the rotation angles used to align the old quaternion to the true one.
+    losses : np.ndarray
+        Angle alignment losses.
+    collect_data : np.ndarray
+        Contains the rotated predicted quaternion from every iteration.
+    trajectory : np.ndarray
+        Contains the rotation matrices predicted at every step.
+    """
     
     def _inner(m, steps, batch_size, optimizer, angles_true, angles_predicted, title):
+        """Angle alignment for the single parameter values (not lists of values)"""
         collect_data = []
 
         time_start = time.time()

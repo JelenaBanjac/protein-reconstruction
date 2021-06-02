@@ -1,4 +1,5 @@
 """
+Code used to genrate the neural network architecture form our paper.
 Relies on the code developed at the following link: https://github.com/HarisIqbal88/PlotNeuralNet
 """
 

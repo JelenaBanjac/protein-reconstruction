@@ -4,7 +4,7 @@ import os
 from sklearn.model_selection import train_test_split
 
 def train_val_test_split(indices, file_name):
-    #file_name = f"{data_dir}/indices.npz"
+    """Train-validation-test split of indices"""
     if not os.path.exists(file_name):
         # the data, split between train and test sets
         train_idx, test_idx = train_test_split(indices, 
@@ -70,6 +70,7 @@ def positive_global_standardization(X):
     return X
 
 def rescale_images(original_images):
+    """Rescale the protein images"""
     mobile_net_possible_dims = [128, 160, 192, 224]
     dim_goal = 128
     
@@ -86,6 +87,7 @@ def rescale_images(original_images):
 
 
 def add_gaussian_noise(projections, noise_var):
+    """Add Gaussian noise to the protein projection image"""
     noise_sigma   = noise_var**0.5
     nproj,row,col = projections.shape
     gauss_noise   = np.random.normal(0, noise_sigma, (nproj, row, col))
@@ -94,6 +96,7 @@ def add_gaussian_noise(projections, noise_var):
     return projections
 
 def add_triangle_translation(projections, left_limit, peak_limit, right_limit):
+    """Add triangular distribution shift to protein center"""
     horizontal_shift = np.random.triangular(left_limit, peak_limit, right_limit, len(projections))
     vertical_shift   = np.random.triangular(left_limit, peak_limit, right_limit, len(projections))
     for i, (hs, vs) in enumerate(zip(horizontal_shift, vertical_shift)):
@@ -102,7 +105,7 @@ def add_triangle_translation(projections, left_limit, peak_limit, right_limit):
     return projections
 
 def projections_preprocessing(projections, angles_true, settings=None):
-    # Add zero-mean Gaussian noise on the projections 
+    """Collection of projection's preprocessing"""
     
     settings_default = dict(
         noise={"variance":0.0},

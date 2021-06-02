@@ -2,24 +2,13 @@ import numpy as np
 import tensorflow as tf
 from tensorflow_graphics.util import safe_ops, asserts, shape
 from tensorflow_graphics.math import vector
-from tensorflow_graphics.geometry.transformation import quaternion, euler
+from tensorflow_graphics.geometry.transformation import quaternion
 import math
 
-def distance_difference(angles_predicted, angles_true):
-    q_predicted = euler2quaternion(angles_predicted)
-    q_true = euler2quaternion(angles_true)
-    qd = np.mean(d_q(q_predicted, q_true).numpy())
-    print(f"Mean `quaternion` distance between true and predicted values: {qd:.3f} rad ({np.degrees(qd):.3f} degrees)")
 
-    # R_predicted = euler2matrix(angles_predicted)
-    # R_true = euler2matrix(angles_true)
-    # rd = np.mean(d_r(R_predicted, R_true).numpy())
-    # print(f"Mean `rotation matrix` distance between true and predicted values: {rd:.3f} rad ({np.degrees(rd):.3f} degrees)")
-
-    return qd #, rd
 
 def euler2quaternion(angles):
-    
+    """Convert euler angles to quaternion with TF support and ZYZ axes"""
     angles = tf.convert_to_tensor(value=angles)
 
     shape.check_static(tensor=angles, tensor_name="angles", has_dim_equals=(-1, 3))
@@ -69,8 +58,11 @@ def euler2quaternion(angles):
     return tf.stack((x, y, z, w), axis=-1)
 
 def quaternion2euler(quaternions):
-    """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
+    """Convert quaternion to euler angle with TF support and ZYZ axes
     
+    Reference on how XYZ axis rotations was implemented in TF: 
+    - https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py
+    """    
     def general_case(r02, r12, r20, r21, r22, eps_addition):
         """Handles the general case."""
         theta_y = tf.acos(r22)
@@ -146,6 +138,7 @@ def quaternion2euler(quaternions):
         return tf.compat.v1.where(gimbal_mask, gimbal_solution, general_solution)             
     
 def d_q(q1, q2):
+    """Distance between two quaternions"""
     q1 = tf.cast(tf.convert_to_tensor(value=q1), dtype=tf.float64)
     q2 = tf.cast(tf.convert_to_tensor(value=q2), dtype=tf.float64)
     
@@ -164,7 +157,11 @@ def d_q(q1, q2):
     return 2.0 * tf.acos(tf.abs(dot_product)) 
 
 def quaternion2matrix(quaternions, transposed=False):
-    """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
+    """Convert quaternion to rotation matrix with TF support and ZYZ axes
+
+    Reference on how XYZ axis rotations was implemented in TF: 
+    - https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py
+    """
 
     quaternions = tf.convert_to_tensor(value=quaternions)
 
@@ -222,6 +219,11 @@ def quaternion2matrix(quaternions, transposed=False):
     return R
 
 def matrix2quaternion(R, transposed=False):
+    """Rotation matrix to quaternion with TF support and ZYZ axes
+
+    Reference on how XYZ axis rotations was implemented in TF: 
+    - https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py
+    """
     R = tf.convert_to_tensor(value=R)
     
     R = tf.reshape(R, [-1, 9])
@@ -298,7 +300,11 @@ def euler2matrix(angles, transposed=False):
     return R
 
 def matrix2euler(R, transposed=False):
-    """https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py"""
+    """Rotation matrix to euler angles with TF support and ZYZ axes
+
+    Reference on how XYZ axis rotations was implemented in TF: 
+    - https://github.com/tensorflow/graphics/blob/master/tensorflow_graphics/geometry/transformation/euler.py
+    """
     
     def general_case(r02, r12, r20, r21, r22, eps_addition):
         """Handles the general case."""
@@ -345,3 +351,18 @@ def matrix2euler(R, transposed=False):
     gimbal_mask = tf.stack((is_gimbal, is_gimbal, is_gimbal), axis=-1)
     
     return tf.compat.v1.where(gimbal_mask, gimbal_solution, general_solution)     
+
+
+def distance_difference(angles_predicted, angles_true):
+    """Testing different distance between angles"""
+    q_predicted = euler2quaternion(angles_predicted)
+    q_true = euler2quaternion(angles_true)
+    qd = np.mean(d_q(q_predicted, q_true).numpy())
+    print(f"Mean `quaternion` distance between true and predicted values: {qd:.3f} rad ({np.degrees(qd):.3f} degrees)")
+
+    # R_predicted = euler2matrix(angles_predicted)
+    # R_true = euler2matrix(angles_true)
+    # rd = np.mean(d_r(R_predicted, R_true).numpy())
+    # print(f"Mean `rotation matrix` distance between true and predicted values: {rd:.3f} rad ({np.degrees(rd):.3f} degrees)")
+
+    return qd #, rd
