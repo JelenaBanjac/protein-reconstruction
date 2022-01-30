@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Banjac"
+  given-names: "Jelena"
+  orcid: "https://orcid.org/0000-0001-7373-4150"
+- family-names: "Donati"
+  given-names: "Laurène"
+  orcid: "https://orcid.org/0000-0001-9834-7755"
+- family-names: "Defferrard"
+  given-names: "Michaël"
+  orcid: "https://orcid.org/0000-0002-6028-9024"
+title: "Learning to recover orientations from projections in single-particle cryo-EM"
+version: 1.0.0
+doi: 10.5281/zenodo.1234
+date-released: 2021
+url: "https://github.com/JelenaBanjac/protein-reconstruction"
+preferred-citation:
+	type: article
+	authors:
+	- family-names: "Banjac"
+		given-names: "Jelena"
+		orcid: "https://orcid.org/0000-0001-7373-4150"
+	- family-names: "Donati"
+		given-names: "Laurène"
+		orcid: "https://orcid.org/0000-0001-9834-7755"
+	- family-names: "Defferrard"
+		given-names: "Michaël"
+		orcid: "https://orcid.org/0000-0002-6028-9024"
+	year: 2021
+  archivePrefix: "arXiv"
+  eprint: "2104.06237"
+	url: "https://arxiv.org/abs/2104.06237"
